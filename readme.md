@@ -35,7 +35,7 @@ This app is divided into **four major modules** along with advanced features for
 | Layer      | Technology       |
 |------------|------------------|
 | Frontend   | Flutter           |
-| Backend    | Node.js + Express |
+| Backend    | Firebase |
 | Notifications | Firebase Cloud Messaging |
 | Hosting/Auth/DB | Firebase (Optional Modules) |
 
