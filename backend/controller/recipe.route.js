@@ -1,0 +1,1 @@
+import recipe from '../model/recipe.js'
