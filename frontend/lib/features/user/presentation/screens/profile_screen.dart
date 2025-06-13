@@ -1,4 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../data/firebase_user_service.dart';
+import '../../domain/user_entity.dart';
+import 'package:frontend/shared/widgets/custom_bottom_bar.dart';
+import '../../data/user_data.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:flutter/services.dart';
+import '/features/user/presentation/widgets/profile_header.dart';
+import '/features/user/presentation/widgets/profile_actions.dart';
+import '/features/user/presentation/widgets/posts_list.dart';
+import '/features/user/presentation/widgets/activity_history.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -8,219 +20,365 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  String userName = 'John Doe';
-  String userEmail = 'johndoe@email.com';
-  String? profileImageUrl;
-
-  final TextEditingController _nameController = TextEditingController();
+  final FirebaseUserService userService = FirebaseUserService();
+  final UserData mockUserData = UserData();
+  String? userId;
+  bool useMock = false;
+  File? _pickedImage;
+  bool _isProcessing = false;
 
   @override
   void initState() {
     super.initState();
-    _nameController.text = userName;
-    // TODO: Load user data from backend/auth provider
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _pickImage() async {
-    // TODO: Implement image picker logic
-    // Example: Use image_picker package to select and upload image
-    // setState(() => profileImageUrl = newImageUrl);
-  }
-
-  void _editName() async {
-    final result = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit Name'),
-        content: TextField(
-          controller: _nameController,
-          decoration: const InputDecoration(labelText: 'Name'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('CANCEL'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, _nameController.text),
-            child: const Text('SAVE'),
-          ),
-        ],
-      ),
-    );
-    if (result != null && result.trim().isNotEmpty) {
-      setState(() => userName = result.trim());
-      // TODO: Update name in backend/auth provider
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+    if (firebaseUser != null && firebaseUser.uid.isNotEmpty) {
+      userId = firebaseUser.uid;
+      useMock = false;
+      _ensureUserInDatabase(firebaseUser);
+    } else {
+      userId = mockUserData.currentUser.id;
+      useMock = true;
     }
   }
 
-  void _updatePassword() async {
-    final TextEditingController _passwordController = TextEditingController();
-    final result = await showDialog<String>(
+  Future<void> _ensureUserInDatabase(User firebaseUser) async {
+    final userDoc = await userService.getUserDoc(firebaseUser.uid);
+    if (!userDoc.exists) {
+      await userService.createUserProfile(
+        uid: firebaseUser.uid,
+        name: firebaseUser.displayName ?? 'New User',
+        email: firebaseUser.email ?? '',
+        avatarUrl: firebaseUser.photoURL,
+      );
+    }
+  }
+
+  Future<void> _pickImage() async {
+    try {
+      final picker = ImagePicker();
+      final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+      if (picked != null) {
+        setState(() {
+          _isProcessing = true;
+        });
+        try {
+          _pickedImage = File(picked.path);
+          String? url;
+          if (!useMock) {
+            url = await userService.uploadUserAvatar(userId!, _pickedImage!);
+            await userService.updateUserProfile(userId!, avatarUrl: url);
+          } else {
+            await mockUserData.updateUserProfile(avatarUrl: picked.path);
+          }
+          setState(() {
+            _pickedImage = null; // Clear after upload to always use latest from backend
+            _isProcessing = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile image updated.')));
+        } catch (e) {
+          setState(() {
+            _isProcessing = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update image: $e')));
+        }
+      }
+    } on PlatformException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Image picker failed: ${e.message ?? e.code}')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Image picker not available or failed: $e')),
+      );
+    }
+  }
+
+  Future<void> _changePassword() async {
+    final controller = TextEditingController();
+    bool valid = false;
+    String? errorText;
+    while (!valid) {
+      final result = await showDialog<String>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Change Password'),
+          content: TextField(
+            controller: controller,
+            obscureText: true,
+            decoration: InputDecoration(
+              labelText: 'New Password',
+              errorText: errorText,
+            ),
+            inputFormatters: [LengthLimitingTextInputFormatter(64)],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('CANCEL')),
+            ElevatedButton(
+              onPressed: () {
+                if (controller.text.trim().length < 6) {
+                  setState(() {
+                    errorText = 'Password must be at least 6 characters.';
+                  });
+                } else {
+                  Navigator.pop(context, controller.text.trim());
+                }
+              },
+              child: const Text('CHANGE'),
+            ),
+          ],
+        ),
+      );
+      if (result == null) return; // Cancelled
+      if (result.length >= 6) {
+        valid = true;
+        setState(() {
+          _isProcessing = true;
+        });
+        try {
+          if (!useMock) {
+            final user = FirebaseAuth.instance.currentUser;
+            if (user != null) {
+              await user.updatePassword(result);
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Password updated.')));
+            }
+          } else {
+            await mockUserData.updatePassword(result);
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Password updated.')));
+          }
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update password: $e')));
+        }
+        setState(() {
+          _isProcessing = false;
+        });
+      } else {
+        errorText = 'Password must be at least 6 characters.';
+      }
+    }
+  }
+
+  Future<void> _deleteAccount() async {
+    final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Update Password'),
-        content: TextField(
-          controller: _passwordController,
-          decoration: const InputDecoration(labelText: 'New Password'),
-          obscureText: true,
-        ),
+        title: const Text('Delete Account'),
+        content: const Text('Are you sure you want to permanently delete your account? This cannot be undone.'),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('CANCEL'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('CANCEL')),
           ElevatedButton(
-            onPressed: () => Navigator.pop(context, _passwordController.text),
-            child: const Text('UPDATE'),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('DELETE'),
           ),
         ],
       ),
     );
-    if (result != null && result.trim().isNotEmpty) {
-      // TODO: Update password in backend/auth provider
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password updated!')),
-      );
+    if (confirm == true) {
+      setState(() {
+        _isProcessing = true;
+      });
+      try {
+        if (!useMock) {
+          final user = FirebaseAuth.instance.currentUser;
+          if (user != null) {
+            await userService.deleteUserProfile(user.uid);
+            await user.delete();
+            await userService.logout();
+            if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
+          }
+        } else {
+          await mockUserData.logout();
+          if (mounted) Navigator.of(context).pop();
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to delete account: $e')));
+      }
+      setState(() {
+        _isProcessing = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
+    Widget buildProfile(UserEntity user, List<Post> posts, List<Activity> activities) {
+      return Stack(
+        children: [
+          SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                ProfileHeader(
+                  user: user,
+                  pickedImage: _pickedImage,
+                  isProcessing: _isProcessing,
+                  onPickImage: _pickImage,
+                ),
+                const SizedBox(height: 16),
+                ProfileActions(
+                  isProcessing: _isProcessing,
+                  onEditProfile: _isProcessing
+                      ? null
+                      : () async {
+                          final nameController = TextEditingController(text: user.name);
+                          final result = await showDialog<Map<String, String?>>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Edit Profile'),
+                              content: TextField(
+                                controller: nameController,
+                                decoration: const InputDecoration(labelText: 'Name'),
+                              ),
+                              actions: [
+                                TextButton(onPressed: () => Navigator.pop(context), child: const Text('CANCEL')),
+                                ElevatedButton(
+                                  onPressed: () => Navigator.pop(context, {'name': nameController.text}),
+                                  child: const Text('SAVE'),
+                                ),
+                              ],
+                            ),
+                          );
+                          if (result != null && result['name'] != null && result['name']!.trim().isNotEmpty) {
+                            setState(() {
+                              _isProcessing = true;
+                            });
+                            if (useMock) {
+                              await mockUserData.updateUserProfile(name: result['name']!.trim());
+                              setState(() {
+                                _isProcessing = false;
+                              });
+                            } else {
+                              await userService.updateUserProfile(userId!, name: result['name']!.trim());
+                              setState(() {
+                                _isProcessing = false;
+                              });
+                            }
+                          }
+                        },
+                  onChangePassword: _changePassword,
+                  onDeleteAccount: _deleteAccount,
+                ),
+                const SizedBox(height: 32),
+                PostsList(posts: posts),
+                const SizedBox(height: 32),
+                ActivityHistory(activities: activities),
+              ],
+            ),
+          ),
+          if (_isProcessing)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black.withOpacity(0.2),
+                child: const Center(child: CircularProgressIndicator()),
+              ),
+            ),
+        ],
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(24.0),
-        children: [
-          const SizedBox(height: 16),
-          Center(
-            child: Stack(
-              children: [
-                CircleAvatar(
-                  radius: 56,
-                  backgroundColor: theme.colorScheme.primaryContainer,
-                  backgroundImage: profileImageUrl != null ? NetworkImage(profileImageUrl!) : null,
-                  child: profileImageUrl == null
-                      ? Icon(Icons.person, size: 64, color: theme.colorScheme.primary)
-                      : null,
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: GestureDetector(
-                    onTap: _pickImage,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primary,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
-                      ),
-                      padding: const EdgeInsets.all(8),
-                      child: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-          Center(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  userName,
-                  style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.edit, size: 20),
-                  onPressed: _editName,
-                  tooltip: 'Edit Name',
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 6),
-          Center(
-            child: Text(
-              userEmail,
-              style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-            ),
-          ),
-          const SizedBox(height: 24),
-          Card(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            elevation: 4,
-            child: Column(
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.lock_outline),
-                  title: const Text('Update Password'),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: _updatePassword,
-                ),
-                const Divider(height: 0),
-                ListTile(
-                  leading: const Icon(Icons.settings),
-                  title: const Text('Settings'),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: () {}, // TODO: Navigate to settings
-                ),
-                const Divider(height: 0),
-                ListTile(
-                  leading: const Icon(Icons.history),
-                  title: const Text('Activity History'),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: () {}, // TODO: Navigate to history
-                ),
-                const Divider(height: 0),
-                ListTile(
-                  leading: const Icon(Icons.logout, color: Colors.red),
-                  title: const Text('Logout', style: TextStyle(color: Colors.red)),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.red),
-                  onTap: () {
-                    // TODO: Add logout logic
-                    Navigator.pop(context);
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: _isProcessing
+                ? null
+                : () async {
+                    if (useMock) {
+                      await mockUserData.logout();
+                      if (mounted) Navigator.of(context).pop();
+                    } else {
+                      await userService.logout();
+                      if (mounted) Navigator.of(context).pop();
+                    }
                   },
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 32),
-          Card(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            elevation: 2,
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.info_outline, color: theme.colorScheme.primary),
-                      const SizedBox(width: 8),
-                      Text('Account Info', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Text('Member since: Jan 2024', style: theme.textTheme.bodyMedium),
-                  const SizedBox(height: 4),
-                  Text('Last updated: Jun 2025', style: theme.textTheme.bodyMedium),
-                  // TODO: Make these dynamic
-                ],
-              ),
-            ),
           ),
         ],
+      ),
+      body: userId == null
+          ? const Center(child: Text('Not logged in'))
+          : useMock
+              ? FutureBuilder<UserEntity>(
+                  future: mockUserData.getUser(),
+                  builder: (context, userSnap) {
+                    if (!userSnap.hasData) return const Center(child: CircularProgressIndicator());
+                    final user = userSnap.data!;
+                    return FutureBuilder<List<Post>>(
+                      future: mockUserData.getUserPosts(),
+                      builder: (context, postSnap) {
+                        if (!postSnap.hasData) return const Center(child: CircularProgressIndicator());
+                        final posts = postSnap.data!;
+                        return FutureBuilder<List<Activity>>(
+                          future: mockUserData.getActivityHistory(),
+                          builder: (context, actSnap) {
+                            if (!actSnap.hasData) return const Center(child: CircularProgressIndicator());
+                            final activities = actSnap.data!;
+                            return buildProfile(user, posts, activities);
+                          },
+                        );
+                      },
+                    );
+                  },
+                )
+              : (userId == null || userId!.isEmpty)
+                  ? const Center(child: Text('User profile not found.'))
+                  : StreamBuilder<UserEntity?>(
+                      stream: userService.userStream(userId!),
+                      builder: (context, userSnap) {
+                        if (userSnap.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        if (!userSnap.hasData || userSnap.data == null) {
+                          final firebaseUser = FirebaseAuth.instance.currentUser;
+                          if (firebaseUser != null) {
+                            _ensureUserInDatabase(firebaseUser);
+                          }
+                          return const Center(child: Text('User profile not found.'));
+                        }
+                        final user = userSnap.data!;
+                        return StreamBuilder<List<Post>>(
+                          stream: userService.userPostsStream(userId!),
+                          builder: (context, postSnap) {
+                            if (!postSnap.hasData) return const Center(child: CircularProgressIndicator());
+                            final posts = postSnap.data!;
+                            return StreamBuilder<List<Activity>>(
+                              stream: userService.activityHistoryStream(userId!),
+                              builder: (context, actSnap) {
+                                if (!actSnap.hasData) return const Center(child: CircularProgressIndicator());
+                                final activities = actSnap.data!;
+                                return buildProfile(user, posts, activities);
+                              },
+                            );
+                          },
+                        );
+                      },
+                    ),
+      bottomNavigationBar: CustomBottomBar(
+        onNav: (index) {
+          switch (index) {
+            case 0:
+              if (ModalRoute.of(context)?.settings.name != '/') {
+                Navigator.pushReplacementNamed(context, '/');
+              }
+              break;
+            case 1:
+              if (ModalRoute.of(context)?.settings.name != '/cookbook') {
+                Navigator.pushReplacementNamed(context, '/cookbook');
+              }
+              break;
+            case 2:
+              if (ModalRoute.of(context)?.settings.name != '/calorie') {
+                Navigator.pushReplacementNamed(context, '/calorie');
+              }
+              break;
+            case 3:
+              // Already on Profile
+              break;
+          }
+        },
       ),
     );
   }

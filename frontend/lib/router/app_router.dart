@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '/features/user/presentation/screens/profile_screen.dart';
 import 'package:frontend/features/cookbook/presentation/screens/recipe_detail_screen.dart';
 import 'package:frontend/home_screen.dart';
 import '/features/auth/presentation/screens/login_screen.dart';
@@ -26,7 +27,7 @@ class AppRouter {
       case '/ai':
         return MaterialPageRoute(builder: (_) => const AIChatScreen());
       case '/profile':
-        return MaterialPageRoute(builder: (_) => const AIChatScreen());
+        return MaterialPageRoute(builder: (_) => const ProfileScreen());
       default:
         return MaterialPageRoute(
           builder: (_) => const Scaffold(

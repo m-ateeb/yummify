@@ -54,7 +54,7 @@ class GoalTab extends StatelessWidget {
 
             final entries = entriesSnapshot.data ?? [];
             final consumedCalories = entries.fold<int>(
-                0, (sum, entry) => sum + entry.calories);
+                0, (sum, entry) => sum + entry.calories.toInt());
 
             return SingleChildScrollView(
               padding: const EdgeInsets.all(16),

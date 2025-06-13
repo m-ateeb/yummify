@@ -5,6 +5,7 @@ import '/features/calorietracker/data/calorie_tracker_repository.dart';
 import '/features/calorietracker/domain/calorie_entry.dart';
 import '../widgets/goal_tab.dart';
 import 'add_calorie_entry.dart';
+
 import 'set_goal_screen.dart' as goal_screen;
 
 class GoalScreen extends StatefulWidget {

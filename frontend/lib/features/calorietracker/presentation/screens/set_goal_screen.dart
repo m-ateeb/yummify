@@ -27,7 +27,6 @@ class _SetGoalScreenState extends State<SetGoalScreen> {
     super.initState();
     _updateEndDate();
     if (widget.goalToEdit != null) {
-      // Initialize with goal values
       _selectedGoalType = widget.goalToEdit!.type;
       _caloriesController.text = widget.goalToEdit!.targetCalories.toString();
       _startDate = widget.goalToEdit!.startDate;
@@ -47,12 +46,10 @@ class _SetGoalScreenState extends State<SetGoalScreen> {
         _endDate = DateTime(_startDate.year, _startDate.month, _startDate.day, 23, 59, 59);
         break;
       case GoalType.weekly:
-      // End of the week (6 days from start)
         _endDate = _startDate.add(const Duration(days: 6));
         _endDate = DateTime(_endDate.year, _endDate.month, _endDate.day, 23, 59, 59);
         break;
       case GoalType.monthly:
-      // End of the month
         int lastDay = DateTime(_startDate.year, _startDate.month + 1, 0).day;
         _endDate = DateTime(_startDate.year, _startDate.month, lastDay, 23, 59, 59);
         break;
@@ -94,8 +91,8 @@ class _SetGoalScreenState extends State<SetGoalScreen> {
         throw Exception('User not logged in');
       }
 
-      final newGoal = Goal(
-        id: '', // Will be set by Firestore
+      final goal = Goal(
+        id: widget.goalToEdit?.id ?? '', // Use existing id if editing
         userId: user.uid,
         targetCalories: double.parse(_caloriesController.text),
         startDate: _startDate,
@@ -103,13 +100,21 @@ class _SetGoalScreenState extends State<SetGoalScreen> {
         type: _selectedGoalType,
       );
 
-      await _repository.setGoal(newGoal);
+      if (widget.goalToEdit != null) {
+        // Update existing goal
+        await _repository.updateGoal(goal);
+      } else {
+        // Create new goal
+        await _repository.setGoal(goal);
+      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Goal saved successfully!')),
+          SnackBar(content: Text(widget.goalToEdit != null
+              ? 'Goal updated successfully!'
+              : 'Goal saved successfully!')),
         );
-        Navigator.pop(context);
+        Navigator.pop(context, true);
       }
     } catch (e) {
       if (mounted) {
@@ -128,6 +133,16 @@ class _SetGoalScreenState extends State<SetGoalScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // ... (rest of your build method remains unchanged)
+    // Only the _saveGoal method is changed
+    // You can keep the rest of your UI as is
+    // ...
+    // (Paste your build method here)
+    // ...
+    // For brevity, not repeating unchanged code
+    // ...
+    // (Paste your _getGoalDescription method here)
+    // ...
     return Scaffold(
       appBar: AppBar(
         title: const Text('Set Calorie Goal'),
@@ -172,8 +187,6 @@ class _SetGoalScreenState extends State<SetGoalScreen> {
                       ),
                     ),
                     const SizedBox(height: 32),
-
-                    // Target calories
                     TextField(
                       controller: _caloriesController,
                       decoration: InputDecoration(
@@ -187,8 +200,6 @@ class _SetGoalScreenState extends State<SetGoalScreen> {
                       keyboardType: TextInputType.number,
                     ),
                     const SizedBox(height: 24),
-
-                    // Goal type selector
                     Text(
                       'Goal Period',
                       style: Theme.of(context).textTheme.titleMedium,
@@ -221,8 +232,6 @@ class _SetGoalScreenState extends State<SetGoalScreen> {
                       },
                     ),
                     const SizedBox(height: 24),
-
-                    // Start date selector
                     Text(
                       'Start Date',
                       style: Theme.of(context).textTheme.titleMedium,
@@ -254,8 +263,6 @@ class _SetGoalScreenState extends State<SetGoalScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-
-                    // End date display (read-only)
                     Text(
                       'End Date',
                       style: Theme.of(context).textTheme.titleMedium,
@@ -283,8 +290,6 @@ class _SetGoalScreenState extends State<SetGoalScreen> {
                       ),
                     ),
                     const SizedBox(height: 32),
-
-                    // Goal description
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
@@ -318,8 +323,6 @@ class _SetGoalScreenState extends State<SetGoalScreen> {
                       ),
                     ),
                     const SizedBox(height: 32),
-
-                    // Save button
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -338,9 +341,9 @@ class _SetGoalScreenState extends State<SetGoalScreen> {
                           height: 24,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                            : const Text(
-                          'SET GOAL',
-                          style: TextStyle(
+                            : Text(
+                          widget.goalToEdit != null ? 'UPDATE GOAL' : 'SET GOAL',
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),

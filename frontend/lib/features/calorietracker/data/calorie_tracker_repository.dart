@@ -180,7 +180,7 @@ class CalorieTrackerRepository {
 
     final totalCalories = query.docs
         .map((doc) => CalorieEntry.fromMap(doc.data(), doc.id).calories)
-        .fold<int>(0, (sum, cal) => sum + cal);
+        .fold<double>(0, (sum, cal) => sum + cal);
 
     final goalDoc =
     await _firestore.collection('user_goals').doc(_user!.uid).get();
