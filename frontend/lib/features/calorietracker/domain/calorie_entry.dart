@@ -20,7 +20,7 @@ class CalorieEntry {
     required this.fat,
     required this.carbs,
     required this.fiber,
-   // required this.category,
+    // required this.category,
     required this.timestamp,
   });
 

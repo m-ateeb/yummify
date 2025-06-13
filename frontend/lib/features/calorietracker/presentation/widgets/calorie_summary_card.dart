@@ -1,4 +1,5 @@
 // lib/features/calorietracker/presentation/widgets/calorie_summary_card.dart
+
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '/features/calorietracker/domain/calorie_entry.dart';
@@ -19,11 +20,7 @@ class CalorieSummaryCard extends StatelessWidget {
     final totalCarbs = entries.fold<double>(0, (sum, entry) => sum + entry.carbs);
     final totalFiber = entries.fold<double>(0, (sum, entry) => sum + entry.fiber);
 
-    final double averageCalories = entries.isEmpty ? 0 : totalCalories / entries.length;
-    final averageProtein = entries.isEmpty ? 0 : totalProtein / entries.length;
-    final averageFat = entries.isEmpty ? 0 : totalFat / entries.length;
-    final averageCarbs = entries.isEmpty ? 0 : totalCarbs / entries.length;
-    final averageFiber = entries.isEmpty ? 0 : totalFiber / entries.length;
+    final averageCalories = entries.isEmpty ? 0 : totalCalories / entries.length;
 
     final List<_InfoCard> cards = [
       _InfoCard(title: 'Total Calories', value: totalCalories, icon: Icons.local_fire_department, color: Colors.redAccent, unit: 'kcal'),
@@ -31,11 +28,7 @@ class CalorieSummaryCard extends StatelessWidget {
       _InfoCard(title: 'Total Fat', value: totalFat, icon: Icons.oil_barrel, color: Colors.orangeAccent, unit: 'g'),
       _InfoCard(title: 'Total Carbs', value: totalCarbs, icon: Icons.bakery_dining, color: Colors.green, unit: 'g'),
       _InfoCard(title: 'Total Fiber', value: totalFiber, icon: Icons.grass, color: Colors.teal, unit: 'g'),
-      _InfoCard(title: 'Avg. Calories', value: averageCalories, icon: Icons.restaurant, color: Colors.purple, unit: 'kcal'),
-      // _InfoCard(title: 'Avg. Protein', value: averageProtein, icon: Icons.fitness_center, color: Colors.blue, unit: 'g'),
-      // _InfoCard(title: 'Avg. Fat', value: averageFat, icon: Icons.oil_barrel, color: Colors.orange, unit: 'g'),
-      // _InfoCard(title: 'Avg. Carbs', value: averageCarbs, icon: Icons.bakery_dining, color: Colors.green, unit: 'g'),
-      // _InfoCard(title: 'Avg. Fiber', value: averageFiber, icon: Icons.grass, color: Colors.teal, unit: 'g'),
+      _InfoCard(title: 'Avg. Calories', value: averageCalories.toDouble(), icon: Icons.restaurant, color: Colors.purple, unit: 'kcal'),
     ];
 
     return Container(
@@ -45,20 +38,20 @@ class CalorieSummaryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         gradient: LinearGradient(
           colors: [
-            Theme.of(context).colorScheme.primaryContainer.withAlpha((0.25 * 255).toInt()),
-            Theme.of(context).colorScheme.secondaryContainer.withAlpha((0.15 * 255).toInt()),
+            Theme.of(context).colorScheme.primaryContainer.withOpacity(0.25),
+            Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.15),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha((0.05 * 255).toInt()),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 16,
-            offset: Offset(0, 8),
+            offset: const Offset(0, 8),
           ),
         ],
-        border: Border.all(color: Colors.white.withAlpha((0.1 * 255).toInt())),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,24 +63,29 @@ class CalorieSummaryCard extends StatelessWidget {
               color: Theme.of(context).colorScheme.onPrimaryContainer,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           LayoutBuilder(
             builder: (context, constraints) {
-              // Calculate width for two cards per row with spacing
-              final double cardWidth = (constraints.maxWidth - 12) / 2;
+              final double cardWidth = (constraints.maxWidth - 14) / 2;
               return Wrap(
-                spacing: 12,
-                runSpacing: 12,
+                spacing: 10,
+                runSpacing: 10,
                 children: cards
-                    .map((card) => SizedBox(width: cardWidth, child: card))
+                    .map(
+                      (card) => SizedBox(
+                    width: cardWidth,
+                    height: 120, // fixed height for equal sizing
+                    child: card,
+                  ),
+                )
                     .toList(),
               );
             },
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 15),
           if (entries.isNotEmpty)
             SizedBox(
-              height: 200,
+              height: 175,
               child: BarChart(
                 BarChartData(
                   alignment: BarChartAlignment.spaceAround,
@@ -96,15 +94,17 @@ class CalorieSummaryCard extends StatelessWidget {
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
-                        getTitlesWidget: (value, meta) => Text(value.toInt().toString(), style: Theme.of(context).textTheme.bodySmall),
+                        getTitlesWidget: (value, _) => Text(value.toInt().toString(),
+                            style: Theme.of(context).textTheme.bodySmall),
                         reservedSize: 32,
                       ),
                     ),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
-                        getTitlesWidget: (value, meta) => Text((value.toInt() + 1).toString(), style: Theme.of(context).textTheme.bodySmall),
-                        reservedSize: 32,
+                        getTitlesWidget: (value, _) => Text((value.toInt() + 1).toString(),
+                            style: Theme.of(context).textTheme.bodySmall),
+                        reservedSize: 30,
                       ),
                     ),
                   ),
@@ -156,32 +156,40 @@ class _InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 32, color: color),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: color,
+    final textTheme = Theme.of(context).textTheme;
+
+    return SizedBox(
+      height: 140, // Equal height
+      child: Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 28, color: color),
+              const SizedBox(height: 8),
+              Text(
+                title,
+                style: textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: color,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '${value.toStringAsFixed(1)} $unit',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: color,
+              const SizedBox(height: 6),
+              Text(
+                '${value.toStringAsFixed(1)} $unit',
+                style: textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -4,6 +4,8 @@
     <!-- Permissions for image picking -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <!-- Optional for legacy file access on Android 10 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
@@ -43,6 +45,16 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <!-- Google Sign-In metadata -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <!-- Required for Google Sign-In -->
+        <meta-data
+            android:name="com.google.android.gms.appid"
+            android:value="1:158625250753:android:e0ef6fc95b73650d6dc340" />
     </application>
 
     <!-- Required for Android 11+ to query external apps -->

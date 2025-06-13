@@ -67,6 +67,10 @@ class _SearchFoodScreenState extends State<SearchFoodScreen> {
     setState(() => _isLoading = true);
     try {
       final nutrition = await service.fetchNutrition(item['id']);
+      // Use the new fetchNutrition result for serving size and description
+      final servingSize = nutrition['serving_size'];
+      final servingDescription = nutrition['serving_description'];
+
       setState(() => _isLoading = false);
 
       showDialog(
@@ -79,12 +83,13 @@ class _SearchFoodScreenState extends State<SearchFoodScreen> {
             children: [
               if (nutrition['image'] != null)
                 Center(child: Image.network(nutrition['image'])),
-              // _nutritionRow('Category', nutrition['category']),
               _nutritionRow('Calories', nutrition['calories'], suffix: 'kcal'),
               _nutritionRow('Protein', nutrition['protein'], suffix: 'g'),
               _nutritionRow('Fat', nutrition['fat'], suffix: 'g'),
               _nutritionRow('Carbohydrates', nutrition['carbs'], suffix: 'g'),
               _nutritionRow('Fiber', nutrition['fiber'], suffix: 'g'),
+              _nutritionRow('Serving', servingDescription),
+              _nutritionRow('Serving Size', servingSize),
             ],
           ),
           actions: [
@@ -102,7 +107,8 @@ class _SearchFoodScreenState extends State<SearchFoodScreen> {
                   'fat': nutrition['fat'],
                   'carbs': nutrition['carbs'],
                   'fiber': nutrition['fiber'],
-                  'category': nutrition['category'],
+                  'servingdescription': servingDescription,
+                  'servingsize': servingSize,
                   'image': nutrition['image'],
                 });
               },

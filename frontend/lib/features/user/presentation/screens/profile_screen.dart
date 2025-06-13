@@ -1,12 +1,16 @@
+import 'dart:io';
+import 'dart:math';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
+
 import '../../data/firebase_user_service.dart';
 import '../../domain/user_entity.dart';
-import 'package:frontend/shared/widgets/custom_bottom_bar.dart';
 import '../../data/user_data.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import 'package:flutter/services.dart';
+
 import '/features/user/presentation/widgets/profile_header.dart';
 import '/features/user/presentation/widgets/profile_actions.dart';
 import '/features/user/presentation/widgets/posts_list.dart';
@@ -22,6 +26,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final FirebaseUserService userService = FirebaseUserService();
   final UserData mockUserData = UserData();
+
   String? userId;
   bool useMock = false;
   File? _pickedImage;
@@ -63,15 +68,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         });
         try {
           _pickedImage = File(picked.path);
-          String? url;
           if (!useMock) {
-            url = await userService.uploadUserAvatar(userId!, _pickedImage!);
+            final url = await userService.uploadUserAvatarToCloudinary(_pickedImage!);
             await userService.updateUserProfile(userId!, avatarUrl: url);
           } else {
             await mockUserData.updateUserProfile(avatarUrl: picked.path);
           }
           setState(() {
-            _pickedImage = null; // Clear after upload to always use latest from backend
+            _pickedImage = null;
             _isProcessing = false;
           });
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile image updated.')));
@@ -128,7 +132,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
       );
-      if (result == null) return; // Cancelled
+      if (result == null) return;
       if (result.length >= 6) {
         valid = true;
         setState(() {
@@ -199,186 +203,175 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> _onRefresh() async {
+    setState(() {});
+  }
+
+  Future<void> _editProfile(UserEntity user) async {
+    final nameController = TextEditingController(text: user.name);
+    final result = await showDialog<Map<String, String?>>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Profile'),
+        content: TextField(
+          controller: nameController,
+          decoration: const InputDecoration(labelText: 'Name'),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('CANCEL')),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, {'name': nameController.text}),
+            child: const Text('SAVE'),
+          ),
+        ],
+      ),
+    );
+    if (result != null && result['name'] != null && result['name']!.trim().isNotEmpty) {
+      setState(() {
+        _isProcessing = true;
+      });
+      if (useMock) {
+        await mockUserData.updateUserProfile(name: result['name']!.trim());
+      } else {
+        await userService.updateUserProfile(userId!, name: result['name']!.trim());
+      }
+      setState(() {
+        _isProcessing = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    Widget buildProfile(UserEntity user, List<Post> posts, List<Activity> activities) {
-      return Stack(
+    Widget profileContent(UserEntity user, List<Post> posts, List<Activity> activities) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                ProfileHeader(
-                  user: user,
-                  pickedImage: _pickedImage,
-                  isProcessing: _isProcessing,
-                  onPickImage: _pickImage,
-                ),
-                const SizedBox(height: 16),
-                ProfileActions(
-                  isProcessing: _isProcessing,
-                  onEditProfile: _isProcessing
-                      ? null
-                      : () async {
-                          final nameController = TextEditingController(text: user.name);
-                          final result = await showDialog<Map<String, String?>>(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: const Text('Edit Profile'),
-                              content: TextField(
-                                controller: nameController,
-                                decoration: const InputDecoration(labelText: 'Name'),
-                              ),
-                              actions: [
-                                TextButton(onPressed: () => Navigator.pop(context), child: const Text('CANCEL')),
-                                ElevatedButton(
-                                  onPressed: () => Navigator.pop(context, {'name': nameController.text}),
-                                  child: const Text('SAVE'),
-                                ),
-                              ],
-                            ),
-                          );
-                          if (result != null && result['name'] != null && result['name']!.trim().isNotEmpty) {
-                            setState(() {
-                              _isProcessing = true;
-                            });
-                            if (useMock) {
-                              await mockUserData.updateUserProfile(name: result['name']!.trim());
-                              setState(() {
-                                _isProcessing = false;
-                              });
-                            } else {
-                              await userService.updateUserProfile(userId!, name: result['name']!.trim());
-                              setState(() {
-                                _isProcessing = false;
-                              });
-                            }
-                          }
-                        },
-                  onChangePassword: _changePassword,
-                  onDeleteAccount: _deleteAccount,
-                ),
-                const SizedBox(height: 32),
-                PostsList(posts: posts),
-                const SizedBox(height: 32),
-                ActivityHistory(activities: activities),
-              ],
-            ),
+          ProfileHeader(
+            user: user,
+            pickedImage: _pickedImage,
+            isProcessing: _isProcessing,
+            onPickImage: _pickImage,
           ),
-          if (_isProcessing)
-            Positioned.fill(
-              child: Container(
-                color: Colors.black.withOpacity(0.2),
-                child: const Center(child: CircularProgressIndicator()),
-              ),
-            ),
+          const SizedBox(height: 16),
+          ProfileActions(
+            isProcessing: _isProcessing,
+            onEditProfile: _isProcessing ? null : () => _editProfile(user),
+            onChangePassword: _changePassword,
+            onDeleteAccount: _deleteAccount,
+          ),
+          const SizedBox(height: 24),
+          PostsList(posts: posts),
+          const SizedBox(height: 24),
+          ActivityHistory(activities: activities),
         ],
       );
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: _isProcessing
-                ? null
-                : () async {
-                    if (useMock) {
-                      await mockUserData.logout();
-                      if (mounted) Navigator.of(context).pop();
-                    } else {
-                      await userService.logout();
-                      if (mounted) Navigator.of(context).pop();
-                    }
-                  },
+      backgroundColor: theme.colorScheme.background,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
           ),
-        ],
+          child: AppBar(
+            automaticallyImplyLeading: false,
+            elevation: 0,
+            flexibleSpace: /* Optional blur effect:
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+              child: */
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    theme.colorScheme.primary.withOpacity(0.9),
+                    theme.colorScheme.secondary.withOpacity(0.9),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+            ),
+            title: const Text(
+              'Profile',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+                letterSpacing: 0.8,
+              ),
+            ),
+            centerTitle: true,
+            iconTheme: const IconThemeData(color: Colors.white),
+          ),
+        ),
       ),
-      body: userId == null
-          ? const Center(child: Text('Not logged in'))
-          : useMock
-              ? FutureBuilder<UserEntity>(
-                  future: mockUserData.getUser(),
-                  builder: (context, userSnap) {
-                    if (!userSnap.hasData) return const Center(child: CircularProgressIndicator());
-                    final user = userSnap.data!;
-                    return FutureBuilder<List<Post>>(
-                      future: mockUserData.getUserPosts(),
-                      builder: (context, postSnap) {
-                        if (!postSnap.hasData) return const Center(child: CircularProgressIndicator());
-                        final posts = postSnap.data!;
-                        return FutureBuilder<List<Activity>>(
-                          future: mockUserData.getActivityHistory(),
-                          builder: (context, actSnap) {
-                            if (!actSnap.hasData) return const Center(child: CircularProgressIndicator());
-                            final activities = actSnap.data!;
-                            return buildProfile(user, posts, activities);
-                          },
-                        );
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: _onRefresh,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.only(bottom: 10),
+            child: userId == null
+                ? const Center(child: Text('Not logged in'))
+                : useMock
+                ? FutureBuilder<UserEntity>(
+              future: mockUserData.getUser(),
+              builder: (context, userSnap) {
+                if (!userSnap.hasData) return const Center(child: CircularProgressIndicator());
+                final user = userSnap.data!;
+                return FutureBuilder<List<Post>>(
+                  future: mockUserData.getUserPosts(),
+                  builder: (context, postSnap) {
+                    if (!postSnap.hasData) return const Center(child: CircularProgressIndicator());
+                    final posts = postSnap.data!;
+                    return FutureBuilder<List<Activity>>(
+                      future: mockUserData.getActivityHistory(),
+                      builder: (context, actSnap) {
+                        if (!actSnap.hasData) return const Center(child: CircularProgressIndicator());
+                        final activities = actSnap.data!;
+                        return profileContent(user, posts, activities);
                       },
                     );
                   },
-                )
-              : (userId == null || userId!.isEmpty)
-                  ? const Center(child: Text('User profile not found.'))
-                  : StreamBuilder<UserEntity?>(
-                      stream: userService.userStream(userId!),
-                      builder: (context, userSnap) {
-                        if (userSnap.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
-                        }
-                        if (!userSnap.hasData || userSnap.data == null) {
-                          final firebaseUser = FirebaseAuth.instance.currentUser;
-                          if (firebaseUser != null) {
-                            _ensureUserInDatabase(firebaseUser);
-                          }
-                          return const Center(child: Text('User profile not found.'));
-                        }
-                        final user = userSnap.data!;
-                        return StreamBuilder<List<Post>>(
-                          stream: userService.userPostsStream(userId!),
-                          builder: (context, postSnap) {
-                            if (!postSnap.hasData) return const Center(child: CircularProgressIndicator());
-                            final posts = postSnap.data!;
-                            return StreamBuilder<List<Activity>>(
-                              stream: userService.activityHistoryStream(userId!),
-                              builder: (context, actSnap) {
-                                if (!actSnap.hasData) return const Center(child: CircularProgressIndicator());
-                                final activities = actSnap.data!;
-                                return buildProfile(user, posts, activities);
-                              },
-                            );
-                          },
-                        );
+                );
+              },
+            )
+                : StreamBuilder<UserEntity?>(
+              stream: userService.userStream(userId!),
+              builder: (context, userSnap) {
+                if (userSnap.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (!userSnap.hasData || userSnap.data == null) {
+                  return const Center(child: Text('User profile not found.'));
+                }
+                final user = userSnap.data!;
+                return StreamBuilder<List<Post>>(
+                  stream: userService.userPostsStream(userId!),
+                  builder: (context, postSnap) {
+                    if (!postSnap.hasData) return const Center(child: CircularProgressIndicator());
+                    final posts = postSnap.data!;
+                    return StreamBuilder<List<Activity>>(
+                      stream: userService.activityHistoryStream(userId!),
+                      builder: (context, actSnap) {
+                        if (!actSnap.hasData) return const Center(child: CircularProgressIndicator());
+                        final activities = actSnap.data!;
+                        return profileContent(user, posts, activities);
                       },
-                    ),
-      bottomNavigationBar: CustomBottomBar(
-        onNav: (index) {
-          switch (index) {
-            case 0:
-              if (ModalRoute.of(context)?.settings.name != '/') {
-                Navigator.pushReplacementNamed(context, '/');
-              }
-              break;
-            case 1:
-              if (ModalRoute.of(context)?.settings.name != '/cookbook') {
-                Navigator.pushReplacementNamed(context, '/cookbook');
-              }
-              break;
-            case 2:
-              if (ModalRoute.of(context)?.settings.name != '/calorie') {
-                Navigator.pushReplacementNamed(context, '/calorie');
-              }
-              break;
-            case 3:
-              // Already on Profile
-              break;
-          }
-        },
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ),
       ),
     );
   }

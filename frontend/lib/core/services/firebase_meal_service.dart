@@ -20,25 +20,44 @@ class FirebaseMealService {
     }).toList();
   }
 
-  // Get full nutrition info by meal ID
+  // Get full nutrition info by meal ID, including serving_description and serving_size
   Future<Map<String, dynamic>> fetchNutrition(String id) async {
     final snapshot = await mealsCollection.where('id', isEqualTo: id).limit(1).get();
-
     if (snapshot.docs.isEmpty) {
       throw Exception('Meal not found');
     }
-
     final data = snapshot.docs.first.data() as Map<String, dynamic>;
     final nutrition = data['nutrition'] ?? {};
-
     return {
       'calories': nutrition['calories'],
       'protein': nutrition['protein_g'],
       'fat': nutrition['fat_g'],
       'carbs': nutrition['carbs_g'],
       'fiber': nutrition['fiber_g'],
+      'serving_description': data['serving_description'],
+      'serving_size': data['serving_size'],
       'image': null, // Add support if your meals have images
     };
+  }
+
+  // Fetch serving description by meal ID
+  Future<String?> fetchServingDescription(String id) async {
+    final snapshot = await mealsCollection.where('id', isEqualTo: id).limit(1).get();
+    if (snapshot.docs.isEmpty) {
+      throw Exception('Meal not found');
+    }
+    final data = snapshot.docs.first.data() as Map<String, dynamic>;
+    return data['serving_description'] as String?;
+  }
+
+  // Fetch serving size by meal ID
+  Future<String?> fetchServingSize(String id) async {
+    final snapshot = await mealsCollection.where('id', isEqualTo: id).limit(1).get();
+    if (snapshot.docs.isEmpty) {
+      throw Exception('Meal not found');
+    }
+    final data = snapshot.docs.first.data() as Map<String, dynamic>;
+    return data['serving_size'] as String?;
   }
 
   // Fetch all meal names for suggestions

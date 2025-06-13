@@ -2,7 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../domain/user_entity.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
-
+import 'package:frontend/main.dart' as main_file;
+import 'package:frontend/main.dart' show uploadImageToCloudinary;
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 class FirebaseUserService {
   final _userCollection = FirebaseFirestore.instance.collection('users');
   final _postsCollection = FirebaseFirestore.instance.collection('posts');
@@ -87,19 +90,26 @@ class FirebaseUserService {
     });
   }
 
-  Future<String> uploadUserAvatar(String userId, File imageFile) async {
-    final ref = FirebaseStorage.instance.ref().child('user_avatars').child('$userId.jpg');
-    final uploadTask = await ref.putFile(imageFile);
-    if (uploadTask.state == TaskState.success) {
-      try {
-        return await ref.getDownloadURL();
-      } catch (e) {
-        throw Exception('Failed to get download URL: $e');
-      }
-    } else {
-      throw Exception('Image upload failed: ${uploadTask.state}');
-    }
+
+  Future<String> uploadUserAvatarToCloudinary(File imageFile) async {
+  const cloudName = 'deplebnn1';
+  const uploadPreset = 'yummify';
+
+  final uri = Uri.parse('https://api.cloudinary.com/v1_1/$cloudName/image/upload');
+  final request = http.MultipartRequest('POST', uri)
+  ..fields['upload_preset'] = uploadPreset
+  ..files.add(await http.MultipartFile.fromPath('file', imageFile.path));
+
+  final response = await request.send();
+  if (response.statusCode == 200) {
+  final responseData = await response.stream.bytesToString();
+  final jsonResponse = json.decode(responseData);
+  return jsonResponse['secure_url']; // This is the URL to save in Firestore
+  } else {
+  throw Exception('Failed to upload image to Cloudinary: ${response.statusCode}');
   }
+  }
+
 
   Future<void> deleteUserProfile(String userId) async {
     // Delete user document
@@ -118,5 +128,29 @@ class FirebaseUserService {
     try {
       await ref.delete();
     } catch (_) {}
+  }
+
+  Future<void> deleteUserAndData(String userId, dynamic authUser) async {
+    // Delete user document
+    await _userCollection.doc(userId).delete();
+    // Delete user's posts
+    final posts = await _postsCollection.where('userId', isEqualTo: userId).get();
+    for (var doc in posts.docs) {
+      await doc.reference.delete();
+    }
+    // Delete user's activities
+    final activities = await _activityCollection.where('userId', isEqualTo: userId).get();
+    for (var doc in activities.docs) {
+      await doc.reference.delete();
+    }
+    // Delete avatar from storage
+    final ref = FirebaseStorage.instance.ref().child('user_avatars').child('$userId.jpg');
+    try {
+      await ref.delete();
+    } catch (_) {}
+    // Delete user from Auth
+    if (authUser != null) {
+      await authUser.delete();
+    }
   }
 }

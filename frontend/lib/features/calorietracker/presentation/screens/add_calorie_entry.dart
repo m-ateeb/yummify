@@ -19,7 +19,8 @@ class _AddCalorieEntryScreenState extends State<AddCalorieEntryScreen> {
   final TextEditingController _fatController = TextEditingController();
   final TextEditingController _carbsController = TextEditingController();
   final TextEditingController _fiberController = TextEditingController();
-  final TextEditingController _categoryController = TextEditingController();
+  final TextEditingController _servingDescriptionController = TextEditingController();
+  final TextEditingController _servingSizeController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
 
   bool _isLoading = false;
@@ -35,7 +36,8 @@ class _AddCalorieEntryScreenState extends State<AddCalorieEntryScreen> {
       _fatController.text = widget.entryToEdit!.fat.toString();
       _carbsController.text = widget.entryToEdit!.carbs.toString();
       _fiberController.text = widget.entryToEdit!.fiber.toString();
-      //_categoryController.text = widget.entryToEdit!.category ?? '';
+      // _servingDescriptionController.text = widget.entryToEdit!.servingDescription;
+      // _servingSizeController.text = widget.entryToEdit!.servingSize ?? '';
     }
   }
 
@@ -61,7 +63,8 @@ class _AddCalorieEntryScreenState extends State<AddCalorieEntryScreen> {
         fat: double.tryParse(_fatController.text) ?? 0,
         carbs: double.tryParse(_carbsController.text) ?? 0,
         fiber: double.tryParse(_fiberController.text) ?? 0,
-        //category: _categoryController.text.isNotEmpty ? _categoryController.text : '',
+        // servingDescription: _servingDescriptionController.text,
+        // servingSize: _servingSizeController.text,
       );
 
       if (widget.entryToEdit != null) {
@@ -126,9 +129,28 @@ class _AddCalorieEntryScreenState extends State<AddCalorieEntryScreen> {
         if (selectedFood['fiber'] != null) {
           _fiberController.text = selectedFood['fiber'].toString();
         }
-        if (selectedFood['category'] != null) {
-          _categoryController.text = selectedFood['category'].toString();
+
+        // Improved logic for serving description
+        final servingDescriptionKeys = ['servingdescription', 'serving_description', 'description'];
+        String? foundServingDescription;
+        for (final key in servingDescriptionKeys) {
+          if (selectedFood[key] != null && selectedFood[key].toString().isNotEmpty) {
+            foundServingDescription = selectedFood[key].toString();
+            break;
+          }
         }
+        _servingDescriptionController.text = foundServingDescription ?? '';
+
+        // Improved logic for serving size
+        final servingSizeKeys = ['servingsize', 'serving_size', 'size'];
+        String? foundServingSize;
+        for (final key in servingSizeKeys) {
+          if (selectedFood[key] != null && selectedFood[key].toString().isNotEmpty) {
+            foundServingSize = selectedFood[key].toString();
+            break;
+          }
+        }
+        _servingSizeController.text = foundServingSize ?? '';
       });
     }
   }
@@ -177,7 +199,7 @@ class _AddCalorieEntryScreenState extends State<AddCalorieEntryScreen> {
                       label: const Text('Search Food'),
                       onPressed: _searchFood,
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 15),
 
                     TextField(
                       controller: _mealController,
@@ -189,7 +211,7 @@ class _AddCalorieEntryScreenState extends State<AddCalorieEntryScreen> {
                         prefixIcon: const Icon(Icons.fastfood),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 13),
 
                     TextField(
                       controller: _caloriesController,
@@ -202,7 +224,7 @@ class _AddCalorieEntryScreenState extends State<AddCalorieEntryScreen> {
                       ),
                       keyboardType: TextInputType.number,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 13),
 
                     TextField(
                       controller: _proteinController,
@@ -215,7 +237,7 @@ class _AddCalorieEntryScreenState extends State<AddCalorieEntryScreen> {
                       ),
                       keyboardType: TextInputType.number,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 13),
 
                     TextField(
                       controller: _fatController,
@@ -228,7 +250,7 @@ class _AddCalorieEntryScreenState extends State<AddCalorieEntryScreen> {
                       ),
                       keyboardType: TextInputType.number,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 13),
 
                     TextField(
                       controller: _carbsController,
@@ -241,7 +263,7 @@ class _AddCalorieEntryScreenState extends State<AddCalorieEntryScreen> {
                       ),
                       keyboardType: TextInputType.number,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 13),
 
                     TextField(
                       controller: _fiberController,
@@ -254,19 +276,31 @@ class _AddCalorieEntryScreenState extends State<AddCalorieEntryScreen> {
                       ),
                       keyboardType: TextInputType.number,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 13),
 
-                    // TextField(
-                    //   controller: _categoryController,
-                    //   decoration: InputDecoration(
-                    //     labelText: 'Category',
-                    //     border: OutlineInputBorder(
-                    //       borderRadius: BorderRadius.circular(12),
-                    //     ),
-                    //     prefixIcon: const Icon(Icons.category),
-                    //   ),
-                    // ),
-                    // const SizedBox(height: 16),
+                    TextField(
+                      controller: _servingDescriptionController,
+                      decoration: InputDecoration(
+                        labelText: 'Serving Description',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        prefixIcon: const Icon(Icons.description),
+                      ),
+                    ),
+                    const SizedBox(height: 13),
+
+                    TextField(
+                      controller: _servingSizeController,
+                      decoration: InputDecoration(
+                        labelText: 'Serving Size',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        prefixIcon: const Icon(Icons.format_size),
+                      ),
+                    ),
+                    const SizedBox(height: 13),
 
                     InkWell(
                       onTap: _selectDate,
@@ -293,7 +327,7 @@ class _AddCalorieEntryScreenState extends State<AddCalorieEntryScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 15),
 
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:frontend/shared/widgets/custom_bottom_bar.dart';
 import '/features/calorietracker/data/calorie_tracker_repository.dart';
 import '/features/calorietracker/domain/calorie_entry.dart';
 import '/features/calorietracker/presentation/widgets/calorie_entry_card.dart';
@@ -55,14 +54,14 @@ class _CalorieTrackerScreenState extends State<CalorieTrackerScreen> {
         return _repository.getEntriesForDay(_selectedDate);
     }
   }
-  //
-  // void _navigateToSetGoal() async {
-  //   await Navigator.push(
-  //     context,
-  //     MaterialPageRoute(builder: (_) => const SetGoalScreen()),
-  //   );
-  //   setState(() {});
-  // }
+
+  void _navigateToSetGoal() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const SetGoalScreen()),
+    );
+    setState(() {});
+  }
 
   String _formatPeriodDate() {
     switch (_filterPeriod) {
@@ -98,239 +97,218 @@ class _CalorieTrackerScreenState extends State<CalorieTrackerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              expandedHeight: 35.0,
-              pinned: true,
-              flexibleSpace: FlexibleSpaceBar(
-                title: const Text('Calorie Tracker'),
-                background: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Theme.of(context).colorScheme.primary,
-                        Theme.of(context).colorScheme.primaryContainer,
-                      ],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 60.0,
+            pinned: true,
+            floating: true,
+            snap: true,
+            flexibleSpace: FlexibleSpaceBar(
+              title: const Text('Calorie Tracker'),
+              background: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Theme.of(context).colorScheme.primary,
+                      Theme.of(context).colorScheme.primaryContainer,
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
                   ),
                 ),
               ),
-              // actions: [
-              //   IconButton(
-              //     icon: const Icon(Icons.flag),
-              //     onPressed: _navigateToSetGoal,
-              //   ),
-              // ],
             ),
+          ),
 
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    // Filter section
-                    Card(
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      child: Column(
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  // Filter section
+                  Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    child: Column(
+                      children: [
+                        ListTile(
+                          title: const Text("Filter By"),
+                          trailing: Icon(_isFilterExpanded ? Icons.expand_less : Icons.expand_more),
+                          onTap: () {
+                            setState(() {
+                              _isFilterExpanded = !_isFilterExpanded;
+                            });
+                          },
+                        ),
+                        if (_isFilterExpanded)
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                            child: Column(
+                              children: [
+                                ToggleButtons(
+                                  isSelected: [
+                                    _filterPeriod == 'day',
+                                    _filterPeriod == 'month',
+                                    _filterPeriod == 'year',
+                                  ],
+                                  onPressed: (int index) {
+                                    setState(() {
+                                      _filterPeriod = ['day', 'month', 'year'][index];
+                                    });
+                                  },
+                                  children: const [
+                                    Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 12),
+                                      child: Text('Day'),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 12),
+                                      child: Text('Month'),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 12),
+                                      child: Text('Year'),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                InkWell(
+                                  onTap: _selectDate,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: Theme.of(context).colorScheme.outline),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(_formatPeriodDate()),
+                                        const Icon(Icons.calendar_today),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                TextField(
+                                  controller: _searchController,
+                                  decoration: InputDecoration(
+                                    labelText: 'Search Meals',
+                                    prefixIcon: const Icon(Icons.search),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _searchQuery = value;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Summary + Goal Cards
+                  StreamBuilder<List<CalorieEntry>>(
+                    stream: _getFilteredEntries(),
+                    builder: (context, snapshot) {
+                      final entries = snapshot.data ?? [];
+                      final totalCalories = entries.fold<int>(0, (sum, e) => sum + e.calories.toInt());
+
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          ListTile(
-                            title: const Text("Filter By"),
-                            trailing: Icon(_isFilterExpanded ? Icons.expand_less : Icons.expand_more),
-                            onTap: () {
-                              setState(() {
-                                _isFilterExpanded = !_isFilterExpanded;
-                              });
+                          CalorieSummaryCard(entries: entries),
+                          const SizedBox(height: 12),
+                          StreamBuilder<List<Goal>>(
+                            stream: _repository.getCurrentGoals(),
+                            builder: (context, goalSnap) {
+                              if (!goalSnap.hasData || goalSnap.data!.isEmpty) {
+                                return const SizedBox.shrink();
+                              }
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => const GoalScreen()),
+                                  );
+                                },
+                                child: GoalProgressCard(
+                                  goal: goalSnap.data!.first,
+                                  consumedCalories: totalCalories,
+                                  onEdit: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (_) => const SetGoalScreen()),
+                                    );
+                                  },
+                                  onDelete: () {
+                                    // Implement delete logic or callback here
+                                  },
+                                ),
+                              );
                             },
                           ),
-                          if (_isFilterExpanded)
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                              child: Column(
-                                children: [
-                                  ToggleButtons(
-                                    isSelected: [
-                                      _filterPeriod == 'day',
-                                      _filterPeriod == 'month',
-                                      _filterPeriod == 'year',
-                                    ],
-                                    onPressed: (int index) {
-                                      setState(() {
-                                        _filterPeriod = ['day', 'month', 'year'][index];
-                                      });
-                                    },
-                                    children: const [
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: 12),
-                                        child: Text('Day'),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: 12),
-                                        child: Text('Month'),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: 12),
-                                        child: Text('Year'),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 16),
-                                  InkWell(
-                                    onTap: _selectDate,
-                                    child: Container(
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: Theme.of(context).colorScheme.outline),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(_formatPeriodDate()),
-                                          const Icon(Icons.calendar_today),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  TextField(
-                                    controller: _searchController,
-                                    decoration: InputDecoration(
-                                      labelText: 'Search Meals',
-                                      prefixIcon: const Icon(Icons.search),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _searchQuery = value;
-                                      });
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
                         ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Summary + Goal Cards
-                    StreamBuilder<List<CalorieEntry>>(
-                      stream: _getFilteredEntries(),
-                      builder: (context, snapshot) {
-                        final entries = snapshot.data ?? [];
-                        final totalCalories = entries.fold<int>(0, (sum, e) => sum + e.calories.toInt());
-
-                        return Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            CalorieSummaryCard(entries: entries),
-                            const SizedBox(height: 12),
-                            // StreamBuilder<List<Goal>>(
-                            //   stream: _repository.getCurrentGoals(),
-                            //   builder: (context, goalSnap) {
-                            //     if (!goalSnap.hasData || goalSnap.data!.isEmpty) {
-                            //       return const SizedBox.shrink();
-                            //     }
-                            //     return GestureDetector(
-                            //       onTap: () {
-                            //         Navigator.push(
-                            //           context,
-                            //           MaterialPageRoute(builder: (_) => const GoalScreen()),
-                            //         );
-                            //       },
-                            //       child: GoalProgressCard(
-                            //         goal: goalSnap.data!.first,
-                            //         consumedCalories: totalCalories,
-                            //         onEdit: () {
-                            //           Navigator.push(
-                            //             context,
-                            //             MaterialPageRoute(builder: (_) => const SetGoalScreen()),
-                            //           );
-                            //         },
-                            //         onDelete: () {
-                            //           // Implement delete logic or callback here
-                            //         },
-                            //       ),
-                            //     );
-                            //   },
-                            // ),
-                          ],
-                        );
-                      },
-                    ),
-                  ],
-                ),
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
+          ),
 
-            // Entry List
-            StreamBuilder<List<CalorieEntry>>(
-              stream: _getFilteredEntries(),
-              builder: (context, snapshot) {
-                final allEntries = snapshot.data ?? [];
-                final entries = _searchQuery.isEmpty
-                    ? allEntries
-                    : allEntries.where((e) => e.mealName.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
+          // Entry List
+          StreamBuilder<List<CalorieEntry>>(
+            stream: _getFilteredEntries(),
+            builder: (context, snapshot) {
+              final allEntries = snapshot.data ?? [];
+              final entries = _searchQuery.isEmpty
+                  ? allEntries
+                  : allEntries.where((e) => e.mealName.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
 
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const SliverFillRemaining(child: Center(child: CircularProgressIndicator()));
-                }
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const SliverFillRemaining(child: Center(child: CircularProgressIndicator()));
+              }
 
-                if (entries.isEmpty) {
-                  return const SliverFillRemaining(child: Center(child: Text('No entries found.')));
-                }
+              if (entries.isEmpty) {
+                return const SliverFillRemaining(child: Center(child: Text('No entries found.')));
+              }
 
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                        (context, index) => Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                      child: CalorieEntryCard(
-                        entry: entries[index],
-                        onEdit: _editEntry,
-                        onDelete: _deleteEntry,
-                      ),
+              return SliverList(
+                delegate: SliverChildBuilderDelegate(
+                      (context, index) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    child: CalorieEntryCard(
+                      entry: entries[index],
+                      onEdit: _editEntry,
+                      onDelete: _deleteEntry,
                     ),
-                    childCount: entries.length,
                   ),
-                );
-              },
-            ),
-          ],
-        ),
-        bottomNavigationBar: CustomBottomBar(
-          onNav: (index) {
-            switch (index) {
-              case 0:
-                Navigator.pushNamed(context, '/');
-                break;
-              case 1:
-                Navigator.pushNamed(context, '/cookbook');
-                break;
-              case 2:
-                break; // Already on Calorie Tracker
-              case 3:
-                Navigator.pushNamed(context, '/profile');
-                break;
-            }
-          },
-        ),
-        floatingActionButton: FloatingActionButton.extended(
+                  childCount: entries.length,
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const AddCalorieEntryScreen()),
-      );
-    },
-    icon: const Icon(Icons.add),
-          label: const Text('Add Meal'),
-        ),
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AddCalorieEntryScreen()),
+          );
+        },
+        icon: const Icon(Icons.add),
+        label: const Text('Add Meal'),
+      ),
     );
   }
 }
