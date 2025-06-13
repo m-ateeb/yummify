@@ -15,6 +15,11 @@ class _AddCalorieEntryScreenState extends State<AddCalorieEntryScreen> {
   final CalorieTrackerRepository _repository = CalorieTrackerRepository();
   final TextEditingController _mealController = TextEditingController();
   final TextEditingController _caloriesController = TextEditingController();
+  final TextEditingController _proteinController = TextEditingController();
+  final TextEditingController _fatController = TextEditingController();
+  final TextEditingController _carbsController = TextEditingController();
+  final TextEditingController _fiberController = TextEditingController();
+  final TextEditingController _categoryController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
 
   bool _isLoading = false;
@@ -26,6 +31,11 @@ class _AddCalorieEntryScreenState extends State<AddCalorieEntryScreen> {
       _mealController.text = widget.entryToEdit!.mealName;
       _caloriesController.text = widget.entryToEdit!.calories.toString();
       _selectedDate = widget.entryToEdit!.timestamp;
+      _proteinController.text = widget.entryToEdit!.protein.toString();
+      _fatController.text = widget.entryToEdit!.fat.toString();
+      _carbsController.text = widget.entryToEdit!.carbs.toString();
+      _fiberController.text = widget.entryToEdit!.fiber.toString();
+      //_categoryController.text = widget.entryToEdit!.category ?? '';
     }
   }
 
@@ -45,8 +55,13 @@ class _AddCalorieEntryScreenState extends State<AddCalorieEntryScreen> {
       final entry = CalorieEntry(
         id: widget.entryToEdit?.id ?? '',
         mealName: _mealController.text,
-        calories: int.parse(_caloriesController.text),
+        calories: double.parse(_caloriesController.text),
         timestamp: _selectedDate,
+        protein: double.tryParse(_proteinController.text) ?? 0,
+        fat: double.tryParse(_fatController.text) ?? 0,
+        carbs: double.tryParse(_carbsController.text) ?? 0,
+        fiber: double.tryParse(_fiberController.text) ?? 0,
+        //category: _categoryController.text.isNotEmpty ? _categoryController.text : '',
       );
 
       if (widget.entryToEdit != null) {
@@ -96,9 +111,23 @@ class _AddCalorieEntryScreenState extends State<AddCalorieEntryScreen> {
     if (selectedFood != null && mounted) {
       setState(() {
         _mealController.text = selectedFood['label'];
-        // Ensure we're getting a valid calorie number
         if (selectedFood['calories'] != null) {
           _caloriesController.text = selectedFood['calories'].toString();
+        }
+        if (selectedFood['protein'] != null) {
+          _proteinController.text = selectedFood['protein'].toString();
+        }
+        if (selectedFood['fat'] != null) {
+          _fatController.text = selectedFood['fat'].toString();
+        }
+        if (selectedFood['carbs'] != null) {
+          _carbsController.text = selectedFood['carbs'].toString();
+        }
+        if (selectedFood['fiber'] != null) {
+          _fiberController.text = selectedFood['fiber'].toString();
+        }
+        if (selectedFood['category'] != null) {
+          _categoryController.text = selectedFood['category'].toString();
         }
       });
     }
@@ -174,6 +203,70 @@ class _AddCalorieEntryScreenState extends State<AddCalorieEntryScreen> {
                       keyboardType: TextInputType.number,
                     ),
                     const SizedBox(height: 16),
+
+                    TextField(
+                      controller: _proteinController,
+                      decoration: InputDecoration(
+                        labelText: 'Protein (g)',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        prefixIcon: const Icon(Icons.egg),
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 16),
+
+                    TextField(
+                      controller: _fatController,
+                      decoration: InputDecoration(
+                        labelText: 'Fat (g)',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        prefixIcon: const Icon(Icons.oil_barrel),
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 16),
+
+                    TextField(
+                      controller: _carbsController,
+                      decoration: InputDecoration(
+                        labelText: 'Carbs (g)',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        prefixIcon: const Icon(Icons.bakery_dining),
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 16),
+
+                    TextField(
+                      controller: _fiberController,
+                      decoration: InputDecoration(
+                        labelText: 'Fiber (g)',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        prefixIcon: const Icon(Icons.grass),
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // TextField(
+                    //   controller: _categoryController,
+                    //   decoration: InputDecoration(
+                    //     labelText: 'Category',
+                    //     border: OutlineInputBorder(
+                    //       borderRadius: BorderRadius.circular(12),
+                    //     ),
+                    //     prefixIcon: const Icon(Icons.category),
+                    //   ),
+                    // ),
+                    // const SizedBox(height: 16),
 
                     InkWell(
                       onTap: _selectDate,

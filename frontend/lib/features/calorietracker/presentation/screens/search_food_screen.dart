@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '/core/services/edamam_service.dart';
+import 'package:frontend/core/services/firebase_meal_service.dart';
 
 class SearchFoodScreen extends StatefulWidget {
   const SearchFoodScreen({super.key});
@@ -9,45 +9,82 @@ class SearchFoodScreen extends StatefulWidget {
 }
 
 class _SearchFoodScreenState extends State<SearchFoodScreen> {
-  final EdamamService _edamamService = EdamamService();
+  final FirebaseMealService service = FirebaseMealService();
   final TextEditingController _searchController = TextEditingController();
 
   bool _isLoading = false;
+  List<Map<String, dynamic>> _results = [];
+  List<String> _recentSearches = [];
+  List<String> _allSuggestions = [];
 
-  void _analyzeNutrition() async {
-    final ingredient = _searchController.text.trim();
-    if (ingredient.isEmpty) return;
+  @override
+  void initState() {
+    super.initState();
+    _loadSuggestions();
+  }
+
+  Future<void> _loadSuggestions() async {
+    final suggestions = await service.fetchAllMealNames();
+    setState(() => _allSuggestions = suggestions);
+  }
+
+  void _saveSearch(String query) {
+    if (!_recentSearches.contains(query)) {
+      setState(() {
+        _recentSearches.insert(0, query);
+        if (_recentSearches.length > 5) {
+          _recentSearches = _recentSearches.sublist(0, 5);
+        }
+      });
+    }
+  }
+
+  void _searchFood() async {
+    final query = _searchController.text.trim();
+    if (query.isEmpty) return;
 
     setState(() {
       _isLoading = true;
+      _results = [];
     });
 
     try {
-      final nutrition = await _edamamService.analyzeNutrition(ingredient);
-
+      final foods = await service.searchFoods(query);
+      _saveSearch(query);
       setState(() {
+        _results = foods;
         _isLoading = false;
       });
+    } catch (e) {
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Search error: $e')),
+      );
+    }
+  }
 
-      final calories = (nutrition['calories'] is int)
-          ? nutrition['calories']
-          : (nutrition['calories'] is double
-              ? (nutrition['calories'] as double).toInt()
-              : int.tryParse(nutrition['calories']?.toString() ?? '0') ?? 0);
+  void _selectFood(Map<String, dynamic> item) async {
+    setState(() => _isLoading = true);
+    try {
+      final nutrition = await service.fetchNutrition(item['id']);
+      setState(() => _isLoading = false);
 
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
-          title: Text(ingredient),
+          title: Text(item['name']),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Calories: $calories kcal'),
-              const SizedBox(height: 10),
-              // Optionally show some main nutrients, for example:
-              if (nutrition['totalNutrients'] != null)
-                ..._buildNutrientWidgets(nutrition['totalNutrients']),
+              if (nutrition['image'] != null)
+                Center(child: Image.network(nutrition['image'])),
+              // _nutritionRow('Category', nutrition['category']),
+              _nutritionRow('Calories', nutrition['calories'], suffix: 'kcal'),
+              _nutritionRow('Protein', nutrition['protein'], suffix: 'g'),
+              _nutritionRow('Fat', nutrition['fat'], suffix: 'g'),
+              _nutritionRow('Carbohydrates', nutrition['carbs'], suffix: 'g'),
+              _nutritionRow('Fiber', nutrition['fiber'], suffix: 'g'),
             ],
           ),
           actions: [
@@ -59,9 +96,15 @@ class _SearchFoodScreenState extends State<SearchFoodScreen> {
               onPressed: () {
                 Navigator.pop(context);
                 Navigator.pop(context, {
-                  'label': ingredient,
-                  'calories': calories,
-                }); // Pass data back if needed
+                  'label': item['name'],
+                  'calories': nutrition['calories'],
+                  'protein': nutrition['protein'],
+                  'fat': nutrition['fat'],
+                  'carbs': nutrition['carbs'],
+                  'fiber': nutrition['fiber'],
+                  'category': nutrition['category'],
+                  'image': nutrition['image'],
+                });
               },
               child: const Text('Add to Tracker'),
             ),
@@ -71,30 +114,9 @@ class _SearchFoodScreenState extends State<SearchFoodScreen> {
     } catch (e) {
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching nutrition: $e')),
+        SnackBar(content: Text('Nutrition error: $e')),
       );
     }
-  }
-
-  List<Widget> _buildNutrientWidgets(Map<String, dynamic> totalNutrients) {
-    // Display some common nutrients, e.g. Protein, Fat, Carbs
-    final nutrientsToShow = ['PROCNT', 'FAT', 'CHOCDF']; // Protein, Fat, Carbs
-    List<Widget> widgets = [];
-
-    for (var key in nutrientsToShow) {
-      if (totalNutrients.containsKey(key)) {
-        final nutrient = totalNutrients[key];
-        final label = nutrient['label'] ?? key;
-        final quantity = nutrient['quantity'] is num
-            ? (nutrient['quantity'] as num).toStringAsFixed(1)
-            : nutrient['quantity']?.toString() ?? '0';
-        final unit = nutrient['unit'] ?? '';
-
-        widgets.add(Text('$label: $quantity $unit'));
-      }
-    }
-
-    return widgets;
   }
 
   @override
@@ -106,26 +128,91 @@ class _SearchFoodScreenState extends State<SearchFoodScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Nutritional Analysis')),
+      appBar: AppBar(title: const Text('Search Meal')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            TextField(
-              controller: _searchController,
-              onSubmitted: (_) => _analyzeNutrition(),
-              decoration: InputDecoration(
-                labelText: 'Enter full ingredient (e.g., "1 apple")',
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: _analyzeNutrition,
+            Autocomplete<String>(
+              optionsBuilder: (TextEditingValue textEditingValue) {
+                if (textEditingValue.text == '') {
+                  return const Iterable<String>.empty();
+                }
+                return _allSuggestions.where((option) =>
+                    option.toLowerCase().contains(textEditingValue.text.toLowerCase()));
+              },
+              onSelected: (String selection) {
+                _searchController.text = selection;
+                _searchFood();
+              },
+              fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
+                _searchController.text = controller.text;
+                return TextField(
+                  controller: controller,
+                  focusNode: focusNode,
+                  onEditingComplete: onEditingComplete,
+                  decoration: InputDecoration(
+                    labelText: 'Enter a meal (e.g., butter)',
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: _searchFood,
+                    ),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 10),
+            if (_recentSearches.isNotEmpty) ...[
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text('Recent Searches:',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
+              Wrap(
+                spacing: 8,
+                children: _recentSearches.map((q) {
+                  return ActionChip(
+                    label: Text(q),
+                    onPressed: () {
+                      _searchController.text = q;
+                      _searchFood();
+                    },
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 10),
+            ],
+            if (_isLoading) const CircularProgressIndicator(),
+            if (!_isLoading)
+              Expanded(
+                child: _results.isEmpty
+                    ? const Center(child: Text('No meals found.'))
+                    : ListView.builder(
+                  itemCount: _results.length,
+                  itemBuilder: (_, index) {
+                    final item = _results[index];
+                    return ListTile(
+                      leading: const Icon(Icons.fastfood),
+                      title: Text(item['name']),
+                      onTap: () => _selectFood(item),
+                    );
+                  },
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            if (_isLoading) const CircularProgressIndicator(),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _nutritionRow(String label, dynamic value, {String suffix = ''}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2.0),
+      child: Row(
+        children: [
+          SizedBox(width: 110, child: Text('$label:', style: const TextStyle(fontWeight: FontWeight.w500))),
+          Text(value != null && value.toString().isNotEmpty ? '$value$suffix' : '--'),
+        ],
       ),
     );
   }

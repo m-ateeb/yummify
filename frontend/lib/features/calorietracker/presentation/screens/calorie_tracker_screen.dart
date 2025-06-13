@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:frontend/shared/widgets/custom_bottom_bar.dart';
 import '/features/calorietracker/data/calorie_tracker_repository.dart';
 import '/features/calorietracker/domain/calorie_entry.dart';
 import '/features/calorietracker/presentation/widgets/calorie_entry_card.dart';
@@ -54,14 +55,14 @@ class _CalorieTrackerScreenState extends State<CalorieTrackerScreen> {
         return _repository.getEntriesForDay(_selectedDate);
     }
   }
-
-  void _navigateToSetGoal() async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const SetGoalScreen()),
-    );
-    setState(() {});
-  }
+  //
+  // void _navigateToSetGoal() async {
+  //   await Navigator.push(
+  //     context,
+  //     MaterialPageRoute(builder: (_) => const SetGoalScreen()),
+  //   );
+  //   setState(() {});
+  // }
 
   String _formatPeriodDate() {
     switch (_filterPeriod) {
@@ -100,7 +101,7 @@ class _CalorieTrackerScreenState extends State<CalorieTrackerScreen> {
         body: CustomScrollView(
           slivers: [
             SliverAppBar(
-              expandedHeight: 150.0,
+              expandedHeight: 35.0,
               pinned: true,
               flexibleSpace: FlexibleSpaceBar(
                 title: const Text('Calorie Tracker'),
@@ -117,12 +118,12 @@ class _CalorieTrackerScreenState extends State<CalorieTrackerScreen> {
                   ),
                 ),
               ),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.flag),
-                  onPressed: _navigateToSetGoal,
-                ),
-              ],
+              // actions: [
+              //   IconButton(
+              //     icon: const Icon(Icons.flag),
+              //     onPressed: _navigateToSetGoal,
+              //   ),
+              // ],
             ),
 
             SliverToBoxAdapter(
@@ -224,42 +225,42 @@ class _CalorieTrackerScreenState extends State<CalorieTrackerScreen> {
                       stream: _getFilteredEntries(),
                       builder: (context, snapshot) {
                         final entries = snapshot.data ?? [];
-                        final totalCalories = entries.fold<int>(0, (sum, e) => sum + e.calories);
+                        final totalCalories = entries.fold<int>(0, (sum, e) => sum + e.calories.toInt());
 
                         return Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             CalorieSummaryCard(entries: entries),
                             const SizedBox(height: 12),
-                            StreamBuilder<List<Goal>>(
-                              stream: _repository.getCurrentGoals(),
-                              builder: (context, goalSnap) {
-                                if (!goalSnap.hasData || goalSnap.data!.isEmpty) {
-                                  return const SizedBox.shrink();
-                                }
-                                return GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (_) => const GoalScreen()),
-                                    );
-                                  },
-                                  child: GoalProgressCard(
-                                    goal: goalSnap.data!.first,
-                                    consumedCalories: totalCalories,
-                                    onEdit: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(builder: (_) => const SetGoalScreen()),
-                                      );
-                                    },
-                                    onDelete: () {
-                                      // Implement delete logic or callback here
-                                    },
-                                  ),
-                                );
-                              },
-                            ),
+                            // StreamBuilder<List<Goal>>(
+                            //   stream: _repository.getCurrentGoals(),
+                            //   builder: (context, goalSnap) {
+                            //     if (!goalSnap.hasData || goalSnap.data!.isEmpty) {
+                            //       return const SizedBox.shrink();
+                            //     }
+                            //     return GestureDetector(
+                            //       onTap: () {
+                            //         Navigator.push(
+                            //           context,
+                            //           MaterialPageRoute(builder: (_) => const GoalScreen()),
+                            //         );
+                            //       },
+                            //       child: GoalProgressCard(
+                            //         goal: goalSnap.data!.first,
+                            //         consumedCalories: totalCalories,
+                            //         onEdit: () {
+                            //           Navigator.push(
+                            //             context,
+                            //             MaterialPageRoute(builder: (_) => const SetGoalScreen()),
+                            //           );
+                            //         },
+                            //         onDelete: () {
+                            //           // Implement delete logic or callback here
+                            //         },
+                            //       ),
+                            //     );
+                            //   },
+                            // ),
                           ],
                         );
                       },
@@ -302,6 +303,23 @@ class _CalorieTrackerScreenState extends State<CalorieTrackerScreen> {
               },
             ),
           ],
+        ),
+        bottomNavigationBar: CustomBottomBar(
+          onNav: (index) {
+            switch (index) {
+              case 0:
+                Navigator.pushNamed(context, '/');
+                break;
+              case 1:
+                Navigator.pushNamed(context, '/cookbook');
+                break;
+              case 2:
+                break; // Already on Calorie Tracker
+              case 3:
+                Navigator.pushNamed(context, '/profile');
+                break;
+            }
+          },
         ),
         floatingActionButton: FloatingActionButton.extended(
         onPressed: () {

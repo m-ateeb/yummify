@@ -1,38 +1,55 @@
+// lib/features/calorietracker/domain/calorie_entry.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CalorieEntry {
   final String id;
   final String mealName;
-  final int calories;
+  final double calories;
+  final double protein;
+  final double fat;
+  final double carbs;
+  final double fiber;
+  //final String category; // e.g., 'natural', 'asian', 'chinese'
   final DateTime timestamp;
 
   CalorieEntry({
     required this.id,
     required this.mealName,
     required this.calories,
+    required this.protein,
+    required this.fat,
+    required this.carbs,
+    required this.fiber,
+   // required this.category,
     required this.timestamp,
   });
 
   factory CalorieEntry.fromMap(Map<String, dynamic> map, String id) {
     final dynamic timestampValue = map['timestamp'];
     DateTime date;
-
     if (timestampValue is Timestamp) {
       date = timestampValue.toDate();
     } else if (timestampValue is String) {
       date = DateTime.parse(timestampValue);
     } else {
-      date = DateTime.now(); // fallback or throw error as needed
+      date = DateTime.now();
+    }
+
+    double parseDouble(dynamic value) {
+      if (value is int) return value.toDouble();
+      if (value is double) return value;
+      return double.tryParse(value?.toString() ?? '0') ?? 0.0;
     }
 
     return CalorieEntry(
       id: id,
       mealName: map['meal'] ?? map['mealName'] ?? '',
-      calories: map['calories'] is int
-          ? map['calories']
-          : (map['calories'] is double
-              ? (map['calories'] as double).toInt()
-              : int.tryParse(map['calories']?.toString() ?? '0') ?? 0),
+      calories: parseDouble(map['calories']),
+      protein: parseDouble(map['protein']),
+      fat: parseDouble(map['fat']),
+      carbs: parseDouble(map['carbs']),
+      fiber: parseDouble(map['fiber']),
+      //category: map['category'] ?? '',
       timestamp: date,
     );
   }
@@ -41,6 +58,11 @@ class CalorieEntry {
     return {
       'meal': mealName,
       'calories': calories,
+      'protein': protein,
+      'fat': fat,
+      'carbs': carbs,
+      'fiber': fiber,
+      //'category': category,
       'timestamp': Timestamp.fromDate(timestamp),
     };
   }
