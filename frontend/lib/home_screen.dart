@@ -7,7 +7,7 @@ import '/features/calorietracker/data/calorie_tracker_repository.dart';
 import 'features/calorietracker/presentation/screens/goal_screen.dart';
 import 'features/calorietracker/presentation/screens/set_goal_screen.dart';
 import '/features/calorietracker/domain/calorie_entry.dart';
-import 'shared/widgets/custom_bottom_bar.dart';
+//import 'shared/widgets/custom_bottom_bar.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -31,12 +31,12 @@ class HomeScreen extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => Navigator.pop(context),
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.logout),
+        //     onPressed: () => Navigator.pop(context),
+        //   ),
+        // ],
       ),
       body: SafeArea(
         child: Padding(
@@ -108,6 +108,12 @@ class HomeScreen extends StatelessWidget {
                             );
                           },
                           onDelete: () {},
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const GoalScreen()),
+                            );
+                          },
                         ),
                       );
                     },
@@ -179,23 +185,29 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: CustomBottomBar(
-        onNav: (index) {
-          switch (index) {
-            case 0:
-              break; // Already on Home
-            case 1:
-              Navigator.pushNamed(context, '/cookbook');
-              break;
-            case 2:
-              Navigator.pushNamed(context, '/calorie');
-              break;
-            case 3:
-              _navigateTo(context, const ProfileScreen());
-              break;
-          }
-        },
-      ),
+      // bottomNavigationBar: CustomBottomBar(
+      //   onNav: (index) {
+      //     switch (index) {
+      //       case 0:
+      //         break; // Already on Home
+      //       case 1:
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(builder: (_) => const CookbookScreen()),
+      //         );
+      //         break;
+      //       case 2:
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(builder: (_) => const CalorieTrackerScreen()),
+      //         );
+      //         break;
+      //       case 3:
+      //         _navigateTo(context, const ProfileScreen());
+      //         break;
+      //     }
+      //   },
+      // ),
     );
   }
 }
@@ -219,7 +231,27 @@ class _NavTile extends StatelessWidget {
     final textColor = Theme.of(context).colorScheme.onSurface;
 
     return InkWell(
-      onTap: onTap,
+      onTap: () {
+        // Use direct navigation for known screens, otherwise fallback to pushNamed
+        if (label == 'Recipes') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const CookbookScreen()),
+          );
+        } else if (label == 'Calorie Tracker') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const CalorieTrackerScreen()),
+          );
+        } else if (label == 'Profile') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const ProfileScreen()),
+          );
+        } else {
+          onTap();
+        }
+      },
       borderRadius: BorderRadius.circular(20),
       child: Ink(
         decoration: BoxDecoration(

@@ -8,6 +8,8 @@ import '/features/cookbook/presentation/screens/cookbook_screen.dart';
 import '/features/community/presentation/screens/community_feed_screen.dart';
 import '/features/calorietracker/presentation/screens/calorie_tracker_screen.dart';
 import '/features/aichat/presentation/screens/aichat_screen.dart';
+import '/features/calorietracker/presentation/screens/goal_screen.dart';
+
 
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -28,6 +30,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const AIChatScreen());
       case '/profile':
         return MaterialPageRoute(builder: (_) => const ProfileScreen());
+      case '/goal':
+        return MaterialPageRoute(builder: (_) => const GoalScreen());
       default:
         return MaterialPageRoute(
           builder: (_) => const Scaffold(

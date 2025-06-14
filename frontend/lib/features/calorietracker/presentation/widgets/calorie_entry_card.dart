@@ -1,11 +1,9 @@
-// lib/features/calorietracker/presentation/widgets/calorie_entry_card.dart
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '/features/calorietracker/domain/calorie_entry.dart';
 import 'dart:math';
 
+import '/features/calorietracker/domain/calorie_entry.dart';
 
-//calorie detail card
 class CalorieEntryCard extends StatelessWidget {
   final CalorieEntry entry;
   final Function(CalorieEntry) onEdit;
@@ -32,133 +30,118 @@ class CalorieEntryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final GlobalKey popupKey = GlobalKey();
+    void showPopupMenu() {
+      final dynamic state = popupKey.currentState;
+      state?.showButtonMenu();
+    }
     return Card(
       elevation: 2,
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Stack(
-        children: [
-          ListTile(
-            contentPadding: const EdgeInsets.all(16),
-            leading: CircleAvatar(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              foregroundColor: Theme.of(context).colorScheme.onPrimary,
-              child: Icon(_getRandomIcon()),
-            ),
-            title: Text(
-              entry.mealName,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-
-// Inside the subtitle of ListTile in CalorieEntryCard
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 4),
-                Text(
-                  DateFormat('MMM d, yyyy - h:mm a').format(entry.timestamp),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: showPopupMenu,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                radius: 22,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                child: Icon(
+                  _getRandomIcon(),
+                  size: 22,
                 ),
-                const SizedBox(height: 8),
-                Table(
-                  columnWidths: const {
-                    0: IntrinsicColumnWidth(),
-                    1: FixedColumnWidth(8),
-                    2: FlexColumnWidth(),
-                  },
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    TableRow(children: [
-                      const Text('Calories:', style: TextStyle(fontWeight: FontWeight.w500)),
-                      const SizedBox(),
-                      Text('${entry.calories.toStringAsFixed(1)} kcal'),
-                    ]),
-                    TableRow(children: [
-                      const Text('Protein:', style: TextStyle(fontWeight: FontWeight.w500)),
-                      const SizedBox(),
-                      Text('${entry.protein.toStringAsFixed(1)} g'),
-                    ]),
-                    TableRow(children: [
-                      const Text('Fat:', style: TextStyle(fontWeight: FontWeight.w500)),
-                      const SizedBox(),
-                      Text('${entry.fat.toStringAsFixed(1)} g'),
-                    ]),
-                    TableRow(children: [
-                      const Text('Carbs:', style: TextStyle(fontWeight: FontWeight.w500)),
-                      const SizedBox(),
-                      Text('${entry.carbs.toStringAsFixed(1)} g'),
-                    ]),
-                    TableRow(children: [
-                      const Text('Fiber:', style: TextStyle(fontWeight: FontWeight.w500)),
-                      const SizedBox(),
-                      Text('${entry.fiber.toStringAsFixed(1)} g'),
-                    ]),
-                  ],
-                ),
-              ],
-            ),
-            trailing: null, // Remove trailing, dots are now at the top
-            onTap: () {
-              showModalBottomSheet(
-                context: context,
-                builder: (_) {
-                  return SafeArea(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                    Text(
+                      entry.mealName,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      DateFormat('MMM d, yyyy - h:mm a').format(entry.timestamp),
+                      style: TextStyle(color: Colors.grey[600], fontSize: 11),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 3),
+                    Row(
                       children: [
-                        ListTile(
-                          leading: const Icon(Icons.edit),
-                          title: const Text('Edit Entry'),
-                          onTap: () {
-                            Navigator.pop(context);
-                            onEdit(entry);
-                          },
+                        Text(
+                          '${entry.calories}',
+                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        ListTile(
-                          leading: const Icon(Icons.delete),
-                          title: const Text('Delete Entry'),
-                          onTap: () {
-                            Navigator.pop(context);
-                            onDelete(entry);
-                          },
-                        ),
+                        const SizedBox(width: 4),
+                        const Text('calories', style: TextStyle(fontSize: 12)),
                       ],
                     ),
-                  );
-                },
-              );
-            },
-          ),
-          Positioned(
-            top: 8,
-            right: 8,
-            child: PopupMenuButton<String>(
-              onSelected: (value) {
-                if (value == 'edit') {
-                  onEdit(entry);
-                } else if (value == 'delete') {
-                  onDelete(entry);
-                }
-              },
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 'edit',
-                  child: ListTile(
-                    leading: Icon(Icons.edit),
-                    title: Text('Edit'),
-                  ),
+                    const SizedBox(height: 2),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 2,
+                      children: [
+                        Text('Fat: ${entry.fat.toStringAsFixed(1)}g', style: const TextStyle(fontSize: 11)),
+                        Text('Carbs: ${entry.carbs.toStringAsFixed(1)}g', style: const TextStyle(fontSize: 11)),
+                        Text('Fiber: ${entry.fiber.toStringAsFixed(1)}g', style: const TextStyle(fontSize: 11)),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    // Text(
+                    //   'Serving: '
+                    //       '${entry.servingDescription.isNotEmpty ? entry.servingDescription : 'N/A'}'
+                    //       '${(entry.servingSize != null && entry.servingSize!.isNotEmpty) ? ' (${entry.servingSize})' : ''}',
+                    //   style: const TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: Colors.grey),
+                    //   maxLines: 1,
+                    //   overflow: TextOverflow.ellipsis,
+                    // ),
+                  ],
                 ),
-                const PopupMenuItem(
-                  value: 'delete',
-                  child: ListTile(
-                    leading: Icon(Icons.delete),
-                    title: Text('Delete'),
-                  ),
+              ),
+              const SizedBox(width: 8),
+              SizedBox(
+                width: 36,
+                child: PopupMenuButton<String>(
+                  key: popupKey,
+                  onSelected: (value) {
+                    if (value == 'edit') onEdit(entry);
+                    if (value == 'delete') onDelete(entry);
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'edit',
+                      child: ListTile(
+                        leading: Icon(Icons.edit),
+                        title: Text('Edit'),
+                      ),
+                    ),
+                    const PopupMenuItem(
+                      value: 'delete',
+                      child: ListTile(
+                        leading: Icon(Icons.delete),
+                        title: Text('Delete'),
+                      ),
+                    ),
+                  ],
+                  icon: const Icon(Icons.more_vert, size: 20),
                 ),
-              ],
-              icon: const Icon(Icons.more_vert),
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

@@ -87,12 +87,10 @@ class _SetGoalScreenState extends State<SetGoalScreen> {
 
     try {
       final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        throw Exception('User not logged in');
-      }
+      if (user == null) throw Exception('User not logged in');
 
       final goal = Goal(
-        id: widget.goalToEdit?.id ?? '', // Use existing id if editing
+        id: widget.goalToEdit?.id ?? '',
         userId: user.uid,
         targetCalories: double.parse(_caloriesController.text),
         startDate: _startDate,
@@ -101,10 +99,8 @@ class _SetGoalScreenState extends State<SetGoalScreen> {
       );
 
       if (widget.goalToEdit != null) {
-        // Update existing goal
         await _repository.updateGoal(goal);
       } else {
-        // Create new goal
         await _repository.setGoal(goal);
       }
 
@@ -131,239 +127,8 @@ class _SetGoalScreenState extends State<SetGoalScreen> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    // ... (rest of your build method remains unchanged)
-    // Only the _saveGoal method is changed
-    // You can keep the rest of your UI as is
-    // ...
-    // (Paste your build method here)
-    // ...
-    // For brevity, not repeating unchanged code
-    // ...
-    // (Paste your _getGoalDescription method here)
-    // ...
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Set Calorie Goal'),
-        elevation: 0,
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Theme.of(context).colorScheme.surface,
-              Theme.of(context).colorScheme.surfaceVariant,
-            ],
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: SingleChildScrollView(
-            child: Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Set Your Calorie Goal',
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Define your target calories and time period',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                    TextField(
-                      controller: _caloriesController,
-                      decoration: InputDecoration(
-                        labelText: 'Target Calories',
-                        hintText: 'e.g. 2000',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        prefixIcon: const Icon(Icons.local_fire_department),
-                      ),
-                      keyboardType: TextInputType.number,
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      'Goal Period',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    SegmentedButton<GoalType>(
-                      segments: const [
-                        ButtonSegment(
-                          value: GoalType.daily,
-                          label: Text('Daily'),
-                          icon: Icon(Icons.calendar_today),
-                        ),
-                        ButtonSegment(
-                          value: GoalType.weekly,
-                          label: Text('Weekly'),
-                          icon: Icon(Icons.view_week),
-                        ),
-                        ButtonSegment(
-                          value: GoalType.monthly,
-                          label: Text('Monthly'),
-                          icon: Icon(Icons.calendar_month),
-                        ),
-                      ],
-                      selected: {_selectedGoalType},
-                      onSelectionChanged: (Set<GoalType> newSelection) {
-                        setState(() {
-                          _selectedGoalType = newSelection.first;
-                          _updateEndDate();
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      'Start Date',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    InkWell(
-                      onTap: _selectStartDate,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Theme.of(context).colorScheme.outline,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              DateFormat('MMM d, yyyy').format(_startDate),
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                            Icon(
-                              Icons.calendar_today,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'End Date',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.event_available,
-                            color: Theme.of(context).colorScheme.secondary,
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            DateFormat('MMM d, yyyy').format(_endDate),
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.info_outline,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Goal Summary',
-                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            _getGoalDescription(),
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: Theme.of(context).colorScheme.primary,
-                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        onPressed: _isLoading ? null : _saveGoal,
-                        child: _isLoading
-                            ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                            : Text(
-                          widget.goalToEdit != null ? 'UPDATE GOAL' : 'SET GOAL',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   String _getGoalDescription() {
-    final caloriesText = _caloriesController.text.isEmpty
-        ? "___"
-        : _caloriesController.text;
+    final caloriesText = _caloriesController.text.isEmpty ? "___" : _caloriesController.text;
 
     String periodDescription;
     switch (_selectedGoalType) {
@@ -378,6 +143,173 @@ class _SetGoalScreenState extends State<SetGoalScreen> {
         break;
     }
 
-    return "You'll receive a notification about whether you've achieved your goal of $caloriesText calories $periodDescription.";
+    return "You'll receive a reminder about your goal of $caloriesText calories $periodDescription.";
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Set Calorie Goal'),
+        elevation: 0,
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Theme.of(context).colorScheme.surface.withOpacity(0.95),
+              Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.9),
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 6,
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: ListView(
+                  children: [
+                    Text(
+                      widget.goalToEdit != null ? 'Edit Your Goal' : 'Set a New Goal',
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Target calories input
+                    TextField(
+                      controller: _caloriesController,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: 'Target Calories',
+                        hintText: 'e.g. 2000',
+                        prefixIcon: const Icon(Icons.local_fire_department),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Goal type selector
+                    Text('Goal Period', style: Theme.of(context).textTheme.titleMedium),
+                    const SizedBox(height: 8),
+                    SegmentedButton<GoalType>(
+                      segments: const [
+                        ButtonSegment(value: GoalType.daily, label: Text("Daily"), icon: Icon(Icons.calendar_today)),
+                        ButtonSegment(value: GoalType.weekly, label: Text("Weekly"), icon: Icon(Icons.view_week)),
+                        ButtonSegment(value: GoalType.monthly, label: Text("Monthly"), icon: Icon(Icons.calendar_month)),
+                      ],
+                      selected: {_selectedGoalType},
+                      onSelectionChanged: (selection) {
+                        setState(() {
+                          _selectedGoalType = selection.first;
+                          _updateEndDate();
+                        });
+                      },
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Start date
+                    Text('Start Date', style: Theme.of(context).textTheme.titleMedium),
+                    const SizedBox(height: 8),
+                    InkWell(
+                      onTap: _selectStartDate,
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Theme.of(context).colorScheme.outline),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(DateFormat('MMM d, yyyy').format(_startDate)),
+                            const Icon(Icons.calendar_today),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // End date
+                    Text('End Date', style: Theme.of(context).textTheme.titleMedium),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.event_available),
+                          const SizedBox(width: 8),
+                          Text(DateFormat('MMM d, yyyy').format(_endDate)),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Goal summary
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.4),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Icon(Icons.info_outline),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              _getGoalDescription(),
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // Submit button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        icon: _isLoading
+                            ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                            : const Icon(Icons.check),
+                        label: Text(widget.goalToEdit != null ? 'UPDATE GOAL' : 'SET GOAL'),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: _isLoading ? null : _saveGoal,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
