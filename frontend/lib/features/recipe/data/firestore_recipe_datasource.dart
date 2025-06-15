@@ -1,31 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../domain/recipe_entity.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final firestoreRecipeDataSourceProvider = Provider<FirestoreRecipeDataSource>((ref) {
-  return FirestoreRecipeDataSource();
-});
 class FirestoreRecipeDataSource {
   final _recipesRef = FirebaseFirestore.instance.collection('recipes');
 
-  /// Create a new recipe document
-  // Future<void> createRecipe(RecipeEntity recipe) async {
-  //   await _recipesRef.add(recipe.toMap());
-  // }
+  Future<void> createRecipe(RecipeEntity recipe) async {
+    final docRef = _recipesRef.doc(); // auto-generate ID
+    await docRef.set(recipe.toMap()); // Use recipe.toMap()
+  }
 
-
-  /// Fetch public recipes or recipes by a specific user
   Future<List<RecipeEntity>> getRecipes({String? userId}) async {
     QuerySnapshot snapshot;
-
     if (userId != null) {
-      snapshot = await _recipesRef
-          .where('createdBy', isEqualTo: userId)
-          .get();
+      // Assuming 'writer' field exists in RecipeEntity
+      snapshot = await _recipesRef.where('writer', isEqualTo: userId).get();
     } else {
-      snapshot = await _recipesRef
-          .where('isPublic', isEqualTo: true)
-          .get();
+      // Assuming 'status' field exists in RecipeEntity
+      snapshot = await _recipesRef.where('status', isEqualTo: 'public').get();
     }
 
     return snapshot.docs
@@ -33,54 +24,98 @@ class FirestoreRecipeDataSource {
         .toList();
   }
 
-  /// Toggle like/unlike
-  Future<void> toggleLike(String recipeId, String userId) async {
-    final doc = _recipesRef.doc(recipeId);
-    final snapshot = await doc.get();
-    final data = snapshot.data() as Map<String, dynamic>;
-
-    List<String> likedBy = List<String>.from(data['likedBy'] ?? []);
-    if (likedBy.contains(userId)) {
-      likedBy.remove(userId);
-    } else {
-      likedBy.add(userId);
-    }
-
-    await doc.update({'likedBy': likedBy});
+  // Changed from Future to Stream for real-time updates on a single recipe
+  Stream<RecipeEntity> getRecipeStream(String id) {
+    return _recipesRef.doc(id).snapshots().map((doc) {
+      if (!doc.exists || doc.data() == null) {
+        // Handle case where recipe might be deleted or not found
+        // You might want to throw an error or return a default/null value
+        throw Exception("Recipe with ID $id not found or data is null.");
+      }
+      return RecipeEntity.fromMap(doc.data() as Map<String, dynamic>, doc.id);
+    });
   }
 
-  /// Toggle bookmark/unbookmark
-  Future<void> toggleBookmark(String recipeId, String userId) async {
-    final doc = _recipesRef.doc(recipeId);
-    final snapshot = await doc.get();
-    final data = snapshot.data() as Map<String, dynamic>;
-
-    List<String> bookmarkedBy = List<String>.from(data['bookmarkedBy'] ?? []);
-    if (bookmarkedBy.contains(userId)) {
-      bookmarkedBy.remove(userId);
-    } else {
-      bookmarkedBy.add(userId);
-    }
-
-    await doc.update({'bookmarkedBy': bookmarkedBy});
+  Future<void> updateRecipe(RecipeEntity updatedRecipe) async {
+    await _recipesRef.doc(updatedRecipe.id).update(updatedRecipe.toMap()); // Use updatedRecipe.toMap()
   }
 
-  /// Get one recipe by ID (for detail screen)
+  Future<void> deleteRecipe(String recipeId) async {
+    await _recipesRef.doc(recipeId).delete();
+  }
   Future<RecipeEntity> getRecipeById(String id) async {
     final doc = await _recipesRef.doc(id).get();
     return RecipeEntity.fromMap(doc.data() as Map<String, dynamic>, doc.id);
   }
+  // --- NEW METHOD FOR RATING ---
+  Future<void> updateRecipeRating({
+    required String recipeId,
+    required String userId,
+    required double newRating,
+    required double? oldRating, // Pass null if it's a new rating
+  }) async {
+    final recipeRef = _recipesRef.doc(recipeId);
+    final userRatingRef = recipeRef.collection('ratings').doc(userId); // Subcollection for individual user ratings
 
-  Future<void> updateRecipe(RecipeEntity updatedRecipe) async {
-    final docRef = FirebaseFirestore.instance.collection('recipes').doc(updatedRecipe.id);
-    await docRef.update(updatedRecipe.toMap());
+    // Use a Firestore transaction to ensure atomicity for aggregate updates
+    return FirebaseFirestore.instance.runTransaction((transaction) async {
+      final recipeDoc = await transaction.get(recipeRef);
+
+      if (!recipeDoc.exists || recipeDoc.data() == null) {
+        throw Exception("Recipe not found for rating: $recipeId");
+      }
+
+      // Re-create RecipeEntity from the transaction's snapshot to get latest values
+      final currentRecipe = RecipeEntity.fromMap(recipeDoc.data() as Map<String, dynamic>, recipeDoc.id);
+
+      double updatedTotalRatingSum = currentRecipe.totalRatingSum;
+      int updatedRatingCount = currentRecipe.ratingCount;
+
+      if (oldRating == null || oldRating == 0.0) {
+        // User is rating for the first time
+        updatedTotalRatingSum += newRating;
+        updatedRatingCount += 1;
+      } else {
+        // User is updating their existing rating
+        updatedTotalRatingSum = updatedTotalRatingSum - oldRating + newRating;
+        // The ratingCount does not change when updating an existing rating
+      }
+
+      final newAverageRating = updatedRatingCount > 0
+          ? updatedTotalRatingSum / updatedRatingCount
+          : 0.0;
+
+      // 1. Update the main recipe document with the new aggregate rating data
+      transaction.update(recipeRef, {
+        'averageRating': newAverageRating,
+        'ratingCount': updatedRatingCount,
+        'totalRatingSum': updatedTotalRatingSum,
+      });
+
+      // 2. Store or update the user's individual rating in the 'ratings' subcollection
+      transaction.set(userRatingRef, {
+        'userId': userId,
+        'rating': newRating,
+        'timestamp': FieldValue.serverTimestamp(), // Records when the rating was made/updated
+      });
+    });
   }
-  Future<void> createRecipe(RecipeEntity recipe) async {
-    final docRef = FirebaseFirestore.instance.collection('recipes').doc();
-    await docRef.set(recipe.toMap());
-  }
-  Future<void> deleteRecipe(String recipeId) async {
-    await _recipesRef.doc(recipeId).delete();
+
+  // --- NEW METHOD TO GET USER'S INDIVIDUAL RATING ---
+  Stream<double> getUserRecipeRatingStream({
+    required String recipeId,
+    required String userId,
+  }) {
+    return _recipesRef
+        .doc(recipeId)
+        .collection('ratings')
+        .doc(userId)
+        .snapshots()
+        .map((doc) {
+      if (doc.exists && doc.data() != null && doc.data()!.containsKey('rating')) {
+        return (doc.data()!['rating'] as num).toDouble();
+      }
+      return 0.0; // Return 0.0 if the user has not rated this recipe yet
+    });
   }
 }
-

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/features/recipe/presentation/screens/allrecipes_screen.dart';
 import 'features/cookbook/presentation/screens/cookbook_screen.dart';
+import 'features/recipe/presentation/screens/createrecipe_screen.dart';
 import 'features/calorietracker/presentation/screens/calorie_tracker_screen.dart';
 import 'features/user/presentation/screens/profile_screen.dart';
 import '/features/calorietracker/presentation/widgets/goal_progress_card.dart';
@@ -15,7 +17,6 @@ class HomeScreen extends StatelessWidget {
   void _navigateTo(BuildContext context, Widget screen) {
     Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
   }
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -142,7 +143,7 @@ class HomeScreen extends StatelessWidget {
                     _NavTile(
                       label: 'Recipes',
                       icon: Icons.menu_book,
-                      onTap: () => Navigator.pushNamed(context, '/cookbook'),
+                      onTap: () => Navigator.pushNamed(context, '/recipe'),
                       color: Colors.deepPurpleAccent.withOpacity(0.1),
                     ),
                     _NavTile(
@@ -238,7 +239,7 @@ class _NavTile extends StatelessWidget {
         if (label == 'Recipes') {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const CookbookScreen()),
+            MaterialPageRoute(builder: (_) => const AllRecipesScreen()),
           );
         } else if (label == 'Calorie Tracker') {
           Navigator.push(

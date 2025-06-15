@@ -44,7 +44,7 @@ const recipeSchema = new Schema({
   descriptionBlock: [descriptionBlockSchema],
 
   instructionSet: [instructionStepSchema],
-
+  
   calorieCount: Number,
   protein: Number,
   carb: Number,
