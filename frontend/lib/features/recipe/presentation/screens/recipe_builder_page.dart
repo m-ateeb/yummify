@@ -1,0 +1,471 @@
+// lib/features/ai_recipe_builder/presentation/recipe_builder_page.dart
+import 'package:flutter/material.dart';
+import '../../data/recipe_repository_provider.dart';
+import '../../domain/recipe_entity.dart';
+import '../../data/gemini_recipe_service.dart'; // Ensure this import path is correct
+import 'package:frontend/providers/providers.dart'; // Ensure this import path is correct for Riverpod providers
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart'; // Required for generating UUID for new RecipeEntity
+
+class RecipeBuilderPage extends ConsumerStatefulWidget {
+  const RecipeBuilderPage({super.key});
+
+  @override
+  ConsumerState<RecipeBuilderPage> createState() => _RecipeBuilderPageState();
+}
+
+class _RecipeBuilderPageState extends ConsumerState<RecipeBuilderPage> {
+  final TextEditingController _recipePromptController = TextEditingController();
+  RecipeEntity? _generatedRecipe;
+  bool _isLoading = false;
+  String? _errorMessage;
+
+  @override
+  void dispose() {
+    _recipePromptController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _generateRecipe() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+      _generatedRecipe = null; // Clear previous recipe when starting new generation
+    });
+
+    final prompt = _recipePromptController.text.trim();
+
+    if (prompt.isEmpty) {
+      setState(() {
+        _errorMessage = 'Please enter a recipe request.';
+        _isLoading = false;
+      });
+      return;
+    }
+
+    try {
+      final userProfileAsync = ref.read(userProfileProvider); // Get AsyncValue<UserProfile>
+
+      // Ensure userProfile data is available. If not, handle gracefully.
+      final userProfile = userProfileAsync.asData?.value;
+      final String userId = userProfile?.uid ?? 'anonymous_user_id'; // Provide a fallback ID
+      final String role = userProfile?.role ?? 'guest'; // Provide a fallback role
+
+      // Call the AI service, passing userId and role
+      final recipe = await generateRecipeWithGemini(
+        recipeRequest: prompt,
+        userId: userId,
+        role: role,
+      );
+
+      setState(() { // <--- THIS IS THE CRUCIAL setState CALL to update the UI
+        _generatedRecipe = recipe;
+        _errorMessage = recipe == null ? 'Failed to generate recipe. Please try again.' : null;
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'An error occurred: ${e.toString()}';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _clearRecipe() {
+    setState(() {
+      _generatedRecipe = null;
+      _recipePromptController.clear();
+      _errorMessage = null;
+    });
+  }
+
+  void _saveRecipe() async {
+    // Check if there's a recipe to save
+    if (_generatedRecipe == null) {
+      setState(() {
+        _errorMessage = 'No recipe to save.';
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true; // Show loading indicator while saving
+      _errorMessage = null;
+    });
+
+    try {
+      final userProfileAsync = ref.read(userProfileProvider);
+      final userProfile = userProfileAsync.asData?.value;
+
+      if (userProfile == null || userProfile.uid == null) {
+        setState(() {
+          _errorMessage = 'User not logged in or missing UID.';
+          _isLoading = false;
+        });
+        return;
+      }
+
+      final recipeRepo = ref.read(recipeRepositoryProvider);
+      final now = DateTime.now();
+
+      // Ensure 'id' is a valid UUID for Firestore, and 'writer' is the user's UID.
+      // Assuming RecipeEntity's 'id' will be used as Firestore document ID.
+      // If AI generated recipe already has an ID, use it, else generate one.
+      final recipeToSave = _generatedRecipe!.copyWith(
+        id: _generatedRecipe!.id.isEmpty ? const Uuid().v4() : _generatedRecipe!.id,
+        writer: userProfile.uid, // Set the writer to the current user's UID
+        status: 'public', // Or 'draft', depending on your app's default save behavior
+        createdAt: now,
+        updatedAt: now,
+      );
+
+      await recipeRepo.createRecipe(recipeToSave);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Recipe saved successfully!')),
+      );
+      _clearRecipe(); // Clear the form and recipe display after successful save
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Failed to save recipe: ${e.toString()}';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false; // Hide loading indicator
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('AI Recipe Builder'),
+        centerTitle: true,
+        backgroundColor: Colors.blue.shade700,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // User Input Section
+            Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _recipePromptController,
+                      decoration: InputDecoration(
+                        labelText: 'What do you want to eat?',
+                        hintText: 'e.g., "A quick and healthy chicken stir-fry"',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.blue.shade600, width: 2),
+                        ),
+                      ),
+                      maxLines: 3,
+                      minLines: 1,
+                      textCapitalization: TextCapitalization.sentences,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton.icon(
+                      onPressed: _isLoading ? null : _generateRecipe,
+                      icon: _isLoading
+                          ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                          : const Icon(Icons.auto_awesome),
+                      label: Text(_isLoading ? 'Generating...' : 'Generate Recipe'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue.shade500,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        elevation: 5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Error Message Display
+            if (_errorMessage != null)
+              Container(
+                padding: const EdgeInsets.all(12),
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade100,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.red.shade400),
+                ),
+                child: Text(
+                  _errorMessage!,
+                  style: TextStyle(color: Colors.red.shade700, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+
+            // Generated Recipe Display
+            Expanded(
+              child: Visibility(
+                visible: _generatedRecipe != null,
+                replacement: Center(
+                  child: Text(
+                    _isLoading ? 'Waiting for AI...' : 'Enter your request above to generate a recipe!',
+                    style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                child: Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: _generatedRecipe != null
+                        ? _buildRecipeDetails(context, _generatedRecipe!)
+                        : const Center(child: Text('No recipe generated yet.')), // Fallback text
+                  ),
+                ),
+              ),
+            ),
+
+            // Action Buttons (Save/Generate New)
+            if (_generatedRecipe != null) ...[
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: _isLoading ? null : _saveRecipe,
+                      icon: _isLoading
+                          ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                          : const Icon(Icons.save),
+                      label: Text(_isLoading ? 'Saving...' : 'Save Recipe'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green.shade500,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        elevation: 5,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _isLoading ? null : _clearRecipe,
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Generate New'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.blue.shade700,
+                        side: BorderSide(color: Colors.blue.shade700, width: 2),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Helper method to build the detailed recipe display
+  Widget _buildRecipeDetails(BuildContext context, RecipeEntity recipe) {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Text(
+              recipe.name,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Center(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.network(
+                recipe.img,
+                height: 200,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  height: 200,
+                  color: Colors.grey[300],
+                  child: const Center(child: Text('Image Load Error')),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildInfoRow('Total Time:', '${recipe.totaltime} minutes'),
+          _buildInfoRow('Cuisine:', recipe.cuisine),
+          _buildInfoRow('Serving:', '${recipe.servingSize} (${recipe.servingDescription})'),
+          _buildInfoRow('Writer:', recipe.writer),
+          _buildInfoRow('Review:', '${recipe.review} / 5.0'),
+          _buildInfoRow('Created At:', '${recipe.createdAt.toLocal().toIso8601String().split('T').first}'),
+          _buildInfoRow('Tags:', recipe.tags.join(', ')),
+
+          const SizedBox(height: 20),
+          _buildSectionTitle('Ingredients'),
+          ...recipe.ingredients.map((ing) => Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+            child: Text(
+              '• ${ing.qty} ${ing.unit} ${ing.name}${ing.note != null && ing.note!.isNotEmpty ? ' (${ing.note})' : ''}',
+              style: const TextStyle(fontSize: 15),
+            ),
+          )),
+
+          const SizedBox(height: 20),
+          _buildSectionTitle('Description'),
+          ...recipe.descriptionBlocks.map((block) => Padding(
+            padding: const EdgeInsets.only(bottom: 12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  block.heading1,
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  block.body,
+                  style: const TextStyle(fontSize: 15),
+                ),
+                if (block.image.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        block.image,
+                        height: 150,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          height: 150,
+                          color: Colors.grey[200],
+                          child: const Center(child: Text('Image error')),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          )),
+
+          const SizedBox(height: 20),
+          _buildSectionTitle('Instructions'),
+          ...recipe.instructionSet.asMap().entries.map((entry) {
+            int index = entry.key;
+            InstructionStep step = entry.value;
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+              child: Text(
+                '${index + 1}. ${step.description}',
+                style: const TextStyle(fontSize: 15),
+              ),
+            );
+          }),
+
+          const SizedBox(height: 20),
+          _buildSectionTitle('Nutrition Facts (per serving)'),
+          _buildNutritionRow('Calories:', '${recipe.nutrition.calories.toStringAsFixed(1)} kcal'),
+          _buildNutritionRow('Carbs:', '${recipe.nutrition.carbsG.toStringAsFixed(1)}g'),
+          _buildNutritionRow('Fat:', '${recipe.nutrition.fatG.toStringAsFixed(1)}g'),
+          _buildNutritionRow('Fiber:', '${recipe.nutrition.fiberG.toStringAsFixed(1)}g'),
+          _buildNutritionRow('Protein:', '${recipe.nutrition.proteinG.toStringAsFixed(1)}g'),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  // Helper method for consistent section titles
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Text(
+        title,
+        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.blue.shade700),
+      ),
+    );
+  }
+
+  // Helper method for consistent info rows (label: value)
+  Widget _buildInfoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 100, // Fixed width for labels for alignment
+            child: Text(
+              label,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(fontSize: 15),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Helper method for consistent nutrition rows (item value)
+  Widget _buildNutritionRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(fontSize: 15),
+          ),
+          Text(
+            value,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+          ),
+        ],
+      ),
+    );
+  }
+}

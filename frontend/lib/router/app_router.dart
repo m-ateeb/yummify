@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/features/recipe/presentation/screens/recipe_builder_page.dart';
 import '/features/user/presentation/screens/profile_screen.dart';
 import 'package:frontend/features/cookbook/presentation/screens/recipe_detail_screen.dart';
 import 'package:frontend/home_screen.dart';
@@ -8,8 +9,8 @@ import '/features/cookbook/presentation/screens/cookbook_screen.dart';
 import '/features/community/presentation/screens/community_feed_screen.dart';
 import '/features/calorietracker/presentation/screens/calorie_tracker_screen.dart';
 import '/features/aichat/presentation/screens/aichat_screen.dart';
-import '/features/calorietracker/presentation/screens/goal_screen.dart';
-
+import 'package:frontend/features/recipe/presentation/screens/allrecipes_screen.dart';
+import 'package:frontend/features/recipe/presentation/screens/community_recipes.dart';
 
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -23,15 +24,15 @@ class AppRouter {
       case '/cookbook':
         return MaterialPageRoute(builder: (_) => CookbookScreen());
       case '/community':
-        return MaterialPageRoute(builder: (_) => CommunityFeedScreen());
+        return MaterialPageRoute(builder: (_) => CommunityRecipeScreen());
       case '/calorie':
         return MaterialPageRoute(builder: (_) => CalorieTrackerScreen());
       case '/ai':
-        return MaterialPageRoute(builder: (_) => const AIChatScreen());
+        return MaterialPageRoute(builder: (_) => const RecipeBuilderPage());
       case '/profile':
         return MaterialPageRoute(builder: (_) => const ProfileScreen());
-      case '/goal':
-        return MaterialPageRoute(builder: (_) => const GoalScreen());
+      case '/recipe':
+        return MaterialPageRoute(builder: (_)=> const AllRecipesScreen());
       default:
         return MaterialPageRoute(
           builder: (_) => const Scaffold(
