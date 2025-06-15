@@ -8,6 +8,7 @@ import '/features/calorietracker/presentation/widgets/goal_progress_card.dart';
 import 'add_calorie_entry.dart';
 import 'set_goal_screen.dart';
 import 'goal_screen.dart';
+import '/shared/widgets/banner_ad.dart';
 
 class CalorieTrackerScreen extends StatefulWidget {
   const CalorieTrackerScreen({super.key});
@@ -256,6 +257,8 @@ class _CalorieTrackerScreenState extends State<CalorieTrackerScreen> {
                               );
                             },
                           ),
+                          MyBannerAdWidget(), // Banner at bottom
+
                         ],
                       );
                     },

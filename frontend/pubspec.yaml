@@ -51,7 +51,8 @@ dependencies:
   image_picker: ^1.0.7
   cloudinary_url_gen: ^1.0.0
   cloudinary_api: ^1.0.0
-
+  google_mobile_ads: ^5.0.0
+  flutter_local_notifications: ^17.0.0
   # Add others like animations, AI SDKs, etc.
 
 dev_dependencies:
@@ -62,19 +63,27 @@ dev_dependencies:
     sdk: flutter
   mockito: ^5.4.3
   flutter_native_splash: ^2.3.6
+  flutter_launcher_icons: ^0.13.1  # Check for the latest version on pub.dev
 
 flutter_native_splash:
-  color: "#ffffff"
-  image: assets/images/logo.png
+  color: "#263B56"           # Background color (hex or color name)
+  image: assets/images/logo.png  # Your logo
+  #branding: assets/images/branding.png  # Optional small branding at the bottom
+  android_gravity: center
+  ios_content_mode: center
+  fullscreen: true
+
+flutter_icons:
   android: true
   ios: true
+  image_path: "assets/images/logo.png"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^5.0.0
+flutter_lints: ^5.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

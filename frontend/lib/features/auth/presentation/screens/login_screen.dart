@@ -44,6 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       if (user != null) {
         if (mounted) {
+          print('login successful');
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Login successful!'),
@@ -52,7 +53,11 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           );
           // Navigate to home screen or main app
-          Navigator.pushReplacementNamed(context, '/');
+          // Navigate safely
+          print('[✔] Navigating to home screen...');
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.of(context).pushReplacementNamed('/');
+          });
         }
       } else {
         if (mounted) {
@@ -85,7 +90,42 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await _authService.signInWithGoogle();
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+      if (googleUser == null) {
+        throw Exception('Google Sign-In aborted by user.');
+      }
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      final User? user = userCredential.user;
+
+      // Check if the user is new and store in Firestore
+      if (userCredential.additionalUserInfo?.isNewUser ?? false) {
+        await _authService.createUserInFirestore(user);  // See below for implementation
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Signed in as ${user?.displayName ?? user?.email ?? 'User'}'),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        // Navigate to home screen or main app
+        // Navigate safely
+        print('[✔] Navigating to home screen...');
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.of(context).pushReplacementNamed('/');
+        });      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

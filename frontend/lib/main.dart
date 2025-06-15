@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart' show FirebaseMessaging;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -6,12 +7,15 @@ import 'router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+//import 'package:flutter_native_splash/android.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'home_screen.dart';
 import 'features/cookbook/presentation/screens/cookbook_screen.dart';
 import 'features/calorietracker/presentation/screens/calorie_tracker_screen.dart';
 import 'features/user/presentation/screens/profile_screen.dart';
 import 'features/auth/presentation/screens/login_screen.dart';
+import './core/services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,10 +37,16 @@ void main() async {
 
   FirebaseFirestore.instance.settings =
       const Settings(persistenceEnabled: true, cacheSizeBytes: 10485760);
-
+  final token = await FirebaseMessaging.instance.getToken();
+  print('FCM Token: $token');
   await ensureUserInFirestore();
+  await MobileAds.instance.initialize(); // Must call before running app
+  await NotificationService.initializeLocalNotifications();
+  await NotificationService.initializeFCM();
 
   runApp(const MyApp());
+
+
 }
 
 Future<void> ensureUserInFirestore() async {
