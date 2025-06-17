@@ -130,7 +130,6 @@
     State<MainNavigationScreen> createState() => _MainNavigationScreenState();
   }
 
-// bottom navbar
   class _MainNavigationScreenState extends State<MainNavigationScreen>
       with SingleTickerProviderStateMixin {
     int _currentIndex = 0;

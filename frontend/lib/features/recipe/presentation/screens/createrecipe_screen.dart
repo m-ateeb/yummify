@@ -1,8 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/features/recipe/domain/recipe_entity.dart'; // Adjust path
-import 'package:frontend/providers/providers.dart'; // Adjust path (your providers file, containing userProfileProvider)
-import 'package:frontend/features/recipe/data/recipe_repository_provider.dart'; // Adjust path
+import 'package:image_picker/image_picker.dart';
+import 'package:frontend/features/user/data/firebase_user_service.dart';
+import 'package:frontend/features/recipe/domain/recipe_entity.dart';
+import 'package:frontend/providers/providers.dart';
+import 'package:frontend/features/recipe/data/recipe_repository_provider.dart';
 
 class CreateRecipeScreen extends ConsumerStatefulWidget {
   const CreateRecipeScreen({super.key});
@@ -12,14 +15,17 @@ class CreateRecipeScreen extends ConsumerStatefulWidget {
 }
 
 class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
-  final _formKey = GlobalKey<FormState>(); // For form validation
+  final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _recipeNameController = TextEditingController();
   final TextEditingController _totalTimeController = TextEditingController();
-  final TextEditingController _thumbnailUrlController = TextEditingController();
 
   String? _selectedCuisine;
-  String? _selectedStatus = 'public'; // Default to public
+  String? _selectedStatus = 'public';
+
+  File? _pickedImage;
+  bool _isUploadingImage = false;
+  String? _uploadedImageUrl;
 
   final List<DescriptionBlock> _descriptionBlocks = [];
   final List<Ingredient> _ingredients = [];
@@ -42,84 +48,145 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
   void dispose() {
     _recipeNameController.dispose();
     _totalTimeController.dispose();
-    _thumbnailUrlController.dispose();
     super.dispose();
   }
 
-  // --- Helper methods for dialogs and UI elements (no significant changes, just included for completeness) ---
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    if (picked != null) {
+      setState(() {
+        _pickedImage = File(picked.path);
+      });
+    }
+  }
 
   void _addDescriptionBlock() {
     final headingController = TextEditingController();
     final bodyController = TextEditingController();
-    final imageController = TextEditingController();
+    File? pickedDescImage;
+    bool isUploadingDescImage = false;
+
+    Future<void> pickDescImage() async {
+      final picker = ImagePicker();
+      final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+      if (picked != null) {
+        setState(() {
+          pickedDescImage = File(picked.path);
+        });
+      }
+    }
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: const Text("Add Description Block", style: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.bold)),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: headingController,
-                decoration: _dialogInputDecoration("Heading"),
-                validator: (value) => value!.isEmpty ? 'Heading is required' : null,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return AlertDialog(
+              backgroundColor: Colors.white,
+              surfaceTintColor: Colors.transparent,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              title: const Text("Add Description Block", style: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.bold)),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextFormField(
+                      controller: headingController,
+                      decoration: _dialogInputDecoration("Heading"),
+                      validator: (value) => value!.isEmpty ? 'Heading is required' : null,
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: bodyController,
+                      decoration: _dialogInputDecoration("Body"),
+                      maxLines: 3,
+                      validator: (value) => value!.isEmpty ? 'Body is required' : null,
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        pickedDescImage != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.file(
+                                  pickedDescImage!,
+                                  width: 60,
+                                  height: 60,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                            : Container(
+                                width: 60,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[200],
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(Icons.image, size: 30, color: Colors.grey),
+                              ),
+                        const SizedBox(width: 12),
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            foregroundColor: Colors.white,
+                          ),
+                          onPressed: isUploadingDescImage ? null : () async {
+                            await pickDescImage();
+                            setStateDialog(() {});
+                          },
+                          icon: const Icon(Icons.upload),
+                          label: Text(isUploadingDescImage ? "Uploading..." : "Pick Image"),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: bodyController,
-                decoration: _dialogInputDecoration("Body"),
-                maxLines: 3,
-                validator: (value) => value!.isEmpty ? 'Body is required' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: imageController,
-                decoration: _dialogInputDecoration("Image URL"),
-                validator: (value) {
-                  if (value!.isEmpty) return 'Image URL is required';
-                  if (!Uri.tryParse(value)!.isAbsolute) return 'Enter a valid URL';
-                  return null;
-                },
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
-            onPressed: () => Navigator.of(ctx).pop(),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.black, foregroundColor: Colors.white),
-            onPressed: () {
-              // Manual validation for dialog fields as they are not part of the main Form widget
-              if (headingController.text.isNotEmpty &&
-                  bodyController.text.isNotEmpty &&
-                  imageController.text.isNotEmpty &&
-                  Uri.tryParse(imageController.text)?.isAbsolute == true) {
-                setState(() {
-                  _descriptionBlocks.add(DescriptionBlock(
-                    heading1: headingController.text,
-                    body: bodyController.text,
-                    image: imageController.text,
-                  ));
-                });
-                Navigator.of(ctx).pop();
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Please fill all fields with valid data in description block.")),
-                );
-              }
-            },
-            child: const Text("Add"),
-          ),
-        ],
-      ),
+              actions: [
+                TextButton(
+                  child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+                  onPressed: () => Navigator.of(ctx).pop(),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.black, foregroundColor: Colors.white),
+                  onPressed: () async {
+                    if (headingController.text.isEmpty || bodyController.text.isEmpty || pickedDescImage == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Please fill all fields and pick an image for the description block.")),
+                      );
+                      return;
+                    }
+                    setStateDialog(() {
+                      isUploadingDescImage = true;
+                    });
+                    try {
+                      final uploadedUrl = await FirebaseUserService().uploadUserAvatarToCloudinary(pickedDescImage!);
+                      setState(() {
+                        _descriptionBlocks.add(DescriptionBlock(
+                          heading1: headingController.text,
+                          body: bodyController.text,
+                          image: uploadedUrl,
+                        ));
+                      });
+                      Navigator.of(ctx).pop();
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Failed to upload image: ${e.toString()}")),
+                      );
+                    } finally {
+                      setStateDialog(() {
+                        isUploadingDescImage = false;
+                      });
+                    }
+                  },
+                  child: const Text("Add"),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
@@ -195,8 +262,8 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
         ),
         actions: [
           TextButton(
-            child: const Text("Cancel", style: TextStyle(color: Colors.grey)), // Added TextStyle wrapper
-            onPressed: () => Navigator.of(ctx).pop(), // <-- This was the main fix!
+            child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+            onPressed: () => Navigator.of(ctx).pop(),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.black, foregroundColor: Colors.white),
@@ -232,88 +299,80 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
     ),
   );
 
-  // --- Main fix in _saveRecipe method ---
   Future<void> _saveRecipe() async {
-    // 1. Validate the main form fields
     if (!_formKey.currentState!.validate()) {
-      return; // Stop if form is not valid
+      return;
     }
-
-    // 2. Validate lists (description blocks, ingredients, instructions)
     if (_descriptionBlocks.isEmpty || _ingredients.isEmpty || _instructions.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please add at least one description block, ingredient, and instruction.")),
       );
       return;
     }
-
-    // 3. Get User Profile and UID/Role
-    // Using ref.read() here because we don't need the UI to rebuild if userProfile changes
-    // while we are in the middle of saving. We just need the current snapshot.
+    if (_pickedImage == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select a recipe image.")),
+      );
+      return;
+    }
     final userProfileAsync = ref.read(userProfileProvider);
-
-    // Handle loading/error states for userProfile. This is crucial.
-    // If the user profile isn't loaded yet, or if there's an error/no user,
-    // we cannot proceed with saving the recipe.
     if (userProfileAsync.isLoading) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Row(children: [CircularProgressIndicator(color: Colors.white), SizedBox(width: 10), Text("Loading user data...")])),
       );
-      // Wait for the next frame for the SnackBar to show, then return
       await Future.delayed(Duration.zero);
       return;
     }
-
     if (userProfileAsync.hasError || userProfileAsync.value == null) {
-      ScaffoldMessenger.of(context).hideCurrentSnackBar(); // Hide any loading snackbar
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("You must be logged in to create a recipe. Please log in.")),
       );
       return;
     }
-
-    // User profile is available, extract UID and Role
     final currentUserProfile = userProfileAsync.value!;
     final userId = currentUserProfile.uid;
-    final userRole = currentUserProfile.role; // This is the dynamic role!
+    final userRole = currentUserProfile.role;
 
-    // Show saving indicator *after* user profile is confirmed
-    ScaffoldMessenger.of(context).hideCurrentSnackBar(); // Hide "Loading user data" if it was shown
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Row(children: [CircularProgressIndicator(color: Colors.white), SizedBox(width: 10), Text("Saving recipe...")])),
     );
 
     try {
+      setState(() {
+        _isUploadingImage = true;
+      });
+      final uploadedUrl = await FirebaseUserService().uploadUserAvatarToCloudinary(_pickedImage!);
+      setState(() {
+        _uploadedImageUrl = uploadedUrl;
+        _isUploadingImage = false;
+      });
+
       final intTotalTime = int.tryParse(_totalTimeController.text) ?? 0;
 
-      // 4. Create the RecipeEntity with dynamic user data
       final newRecipe = RecipeEntity(
-        id: '', // Firestore will generate this
+        id: '',
         name: _recipeNameController.text.trim(),
-        writer: userId, // Current authenticated user ID
-        // Use dynamically fetched data for createdBy and role
-        createdBy: userId, // Set createdBy to the user's UID
-        role: userRole, // **FIXED**: Dynamically set user's role here!
-        visibility: _selectedStatus!, // 'public' or 'private' from _selectedStatus
-        img: _thumbnailUrlController.text.trim().isNotEmpty
-            ? _thumbnailUrlController.text.trim()
-            : 'https://via.placeholder.com/400x200?text=Recipe+Image', // Provide a robust placeholder
-        tags: [], // Consider adding UI for tags later
-        servingDescription: 'Serves 1', // Default, consider UI
-        servingSize: '1', // Default, consider UI
-        searchIndex: [], // Typically generated for search indexing
-        nutrition: Nutrition(calories: 0, carbsG: 0, fatG: 0, fiberG: 0, proteinG: 0), // Default, consider UI
-        apiCalls: [], // Default if not used
-        review: 0.0, // Default review for new recipe
-        updatedAt: DateTime.now(), // Set updatedAt
+        writer: userId,
+        createdBy: userId,
+        role: userRole,
+        visibility: _selectedStatus!,
+        img: _uploadedImageUrl!,
+        tags: [],
+        servingDescription: 'Serves 1',
+        servingSize: '1',
+        searchIndex: [],
+        nutrition: Nutrition(calories: 0, carbsG: 0, fatG: 0, fiberG: 0, proteinG: 0),
+        apiCalls: [],
+        review: 0.0,
+        updatedAt: DateTime.now(),
         descriptionBlocks: _descriptionBlocks,
         ingredients: _ingredients,
         instructionSet: _instructions,
         totaltime: intTotalTime,
         cuisine: _selectedCuisine ?? 'Other',
         createdAt: DateTime.now(),
-        // Note: 'status' and 'visibility' fields. If they serve the same purpose,
-        // you might simplify your RecipeEntity to use only one (e.g., 'visibility').
         status: _selectedStatus!,
         averageRating: 0.0,
         ratingCount: 0,
@@ -323,14 +382,17 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
       final repo = ref.read(recipeRepositoryProvider);
       await repo.createRecipe(newRecipe);
 
-      ScaffoldMessenger.of(context).hideCurrentSnackBar(); // Hide saving indicator
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Recipe saved successfully!"), backgroundColor: Colors.green),
       );
-      Navigator.of(context).pop(); // Go back to previous screen
+      Navigator.of(context).pop();
     } catch (e, stackTrace) {
-      ScaffoldMessenger.of(context).hideCurrentSnackBar(); // Hide saving indicator
-      debugPrint('Error saving recipe: $e\n$stackTrace'); // Use debugPrint for better logging in Flutter
+      setState(() {
+        _isUploadingImage = false;
+      });
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      debugPrint('Error saving recipe: $e\n$stackTrace');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Failed to save recipe: ${e.toString()}"), backgroundColor: Colors.red),
       );
@@ -370,19 +432,38 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              TextFormField(
-                controller: _thumbnailUrlController,
-                decoration: _inputDecoration("Thumbnail Image URL"),
-                keyboardType: TextInputType.url,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a thumbnail image URL';
-                  }
-                  if (!Uri.tryParse(value)!.isAbsolute) {
-                    return 'Please enter a valid URL';
-                  }
-                  return null;
-                },
+              Row(
+                children: [
+                  _pickedImage != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.file(
+                            _pickedImage!,
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : Container(
+                          width: 100,
+                          height: 100,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(Icons.image, size: 40, color: Colors.grey),
+                        ),
+                  const SizedBox(width: 16),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
+                    ),
+                    onPressed: _isUploadingImage ? null : _pickImage,
+                    icon: const Icon(Icons.upload),
+                    label: Text(_isUploadingImage ? "Uploading..." : "Pick Image"),
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -441,7 +522,6 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
                   return null;
                 },
               ),
-
               _sectionTitle("Description Blocks"),
               ..._descriptionBlocks.map((block) {
                 return _buildDescriptionBlockCard(block);
@@ -459,7 +539,6 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
                   ),
                 ),
               ),
-
               _sectionTitle("Ingredients"),
               _buildIngredientsList(),
               Align(
@@ -475,7 +554,6 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
                   ),
                 ),
               ),
-
               _sectionTitle("Instructions"),
               _buildInstructionsList(),
               Align(
@@ -491,7 +569,6 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 40),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -517,7 +594,6 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
     );
   }
 
-  // --- Input Decoration Helper Methods ---
   InputDecoration _inputDecoration(String label) {
     return InputDecoration(
       labelText: label,
@@ -561,8 +637,6 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     );
   }
-
-  // --- Build List Widgets (no changes, included for completeness) ---
 
   Widget _buildDescriptionBlockCard(DescriptionBlock block) {
     return Container(
