@@ -31,6 +31,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool useMock = false;
   File? _pickedImage;
   bool _isProcessing = false;
+  bool _isUploadingAvatar = false; // Add this flag
 
   @override
   void initState() {
@@ -64,27 +65,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
       if (picked != null) {
         setState(() {
-          _isProcessing = true;
-        });
-        try {
           _pickedImage = File(picked.path);
-          if (!useMock) {
-            final url = await userService.uploadUserAvatarToCloudinary(_pickedImage!);
-            await userService.updateUserProfile(userId!, avatarUrl: url);
-          } else {
-            await mockUserData.updateUserProfile(avatarUrl: picked.path);
-          }
-          setState(() {
-            _pickedImage = null;
-            _isProcessing = false;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile image updated.')));
-        } catch (e) {
-          setState(() {
-            _isProcessing = false;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update image: $e')));
-        }
+        });
+        _showAvatarPreviewDialog();
       }
     } on PlatformException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -95,6 +78,74 @@ class _ProfileScreenState extends State<ProfileScreen> {
         SnackBar(content: Text('Image picker not available or failed: $e')),
       );
     }
+  }
+
+  void _showAvatarPreviewDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return AlertDialog(
+              title: const Text('Preview Profile Image'),
+              content: _pickedImage != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.file(
+                        _pickedImage!,
+                        width: 120,
+                        height: 120,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _pickedImage = null;
+                    });
+                    Navigator.of(ctx).pop();
+                  },
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: _isUploadingAvatar
+                      ? null
+                      : () async {
+                          setStateDialog(() {
+                            _isUploadingAvatar = true;
+                          });
+                          try {
+                            if (_pickedImage != null) {
+                              final url = await userService.uploadUserAvatarToCloudinary(_pickedImage!);
+                              await userService.updateUserProfile(userId!, avatarUrl: url);
+                              setState(() {
+                                _pickedImage = null;
+                              });
+                              if (mounted) {
+                                Navigator.of(ctx).pop();
+                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile image updated.')));
+                              }
+                            }
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update image: $e')));
+                          } finally {
+                            setStateDialog(() {
+                              _isUploadingAvatar = false;
+                            });
+                          }
+                        },
+                  child: _isUploadingAvatar
+                      ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2))
+                      : const Text('Confirm'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   Future<void> _changePassword() async {
