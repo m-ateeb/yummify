@@ -4,7 +4,6 @@ import 'package:frontend/features/recipe/data/recipe_repository_provider.dart'; 
 import 'package:frontend/features/recipe/domain/recipe_entity.dart';
 import 'package:frontend/features/recipe/presentation/screens/recipedetail_screen.dart';
 import 'package:frontend/features/recipe/presentation/screens/edit_my_recipe_screen.dart'; // NEW: Import the edit screen
-import 'package:frontend/features/recipe/data/recipe_repository_provider.dart'; // Assuming myRecipesProvider is here
 
 class MyRecipesScreen extends ConsumerStatefulWidget {
   const MyRecipesScreen({super.key});
@@ -116,20 +115,20 @@ class _MyRecipesScreenState extends ConsumerState<MyRecipesScreen> with SingleTi
                       crossAxisCount: 2,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
-                      childAspectRatio: 0.78, // Slightly adjusted for button
+                      childAspectRatio: 0.7, // <-- ADJUSTED THIS VALUE FOR MORE HEIGHT
                     ),
                     itemBuilder: (context, index) {
                       final recipe = userRecipes[index];
                       return _MyRecipeCard(
                         recipe: recipe,
                         onEdit: () {
-                          // Navigate to the edit screen
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (_) => EditMyRecipeScreen(recipe: recipe),
-                          //   ),
-                          // );
+                          //Navigate to the edit screen
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => EditMyRecipeScreen(recipe: recipe),
+                            ),
+                          );
                         },
                         onDelete: () {
                           // TODO: Implement delete functionality for this recipe
@@ -254,11 +253,11 @@ class _MyRecipeCard extends StatelessWidget {
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
                 child: Image.network(
                   recipe.img,
-                  height: 100, // Slightly reduced height to make space for buttons
+                  height: 90, // <-- ADJUSTED THIS VALUE SLIGHTLY
                   width: double.infinity,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => Container(
-                    height: 100,
+                    height: 90, // <-- ADJUSTED THIS VALUE SLIGHTLY
                     color: Colors.grey[200],
                     child: const Center(child: Icon(Icons.broken_image, color: Colors.grey)),
                   ),

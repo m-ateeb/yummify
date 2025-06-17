@@ -40,6 +40,8 @@ final allPublicRecipesProvider = FutureProvider<List<RecipeEntity>>((ref) async 
   log('Provider: allPublicRecipesProvider - Filtered to ${filteredRecipes.length} public recipes.');
   return filteredRecipes;
 });
+// Example in FirebaseRecipeDataSource
+
 
 /// Provider for "All Recipes Page" - YUMMIFY OFFICIAL RECIPES
 /// Assumes Yummify recipes have `role` NOT equal to 'user' (e.g., 'admin', 'yummify_official')

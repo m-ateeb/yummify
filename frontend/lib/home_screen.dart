@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+// Note: CachedNetworkImage and Random were removed as they are not used in this version.
+// If you need them for future features (like random recipes with images), re-add them.
+// import 'package:cached_network_image/cached_network_image.dart';
+// import 'dart:math';
+
 import 'package:frontend/features/recipe/presentation/screens/allrecipes_screen.dart';
 import 'package:frontend/features/recipe/presentation/screens/community_recipes.dart';
+import 'package:frontend/features/recipe/presentation/screens/my_recipe_screen.dart'; // Import MyRecipesScreen
 import 'package:frontend/features/calorietracker/presentation/screens/calorie_tracker_screen.dart';
 import 'package:frontend/features/calorietracker/presentation/screens/goal_screen.dart';
 import 'package:frontend/features/calorietracker/presentation/screens/set_goal_screen.dart';
@@ -11,8 +17,9 @@ import 'package:frontend/features/calorietracker/domain/calorie_entry.dart';
 import 'package:frontend/features/recipe/presentation/screens/recipe_builder_page.dart';
 import 'package:frontend/features/user/presentation/screens/profile_screen.dart';
 import 'package:frontend/shared/widgets/banner_ad.dart';
+// Assuming Goal is defined here based on previous context, crucial for StreamBuilder<List<Goal>>
 
-class HomeScreen extends ConsumerStatefulWidget { // Changed to StatefulWidget for animations
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
@@ -20,7 +27,6 @@ class HomeScreen extends ConsumerStatefulWidget { // Changed to StatefulWidget f
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStateMixin {
-  // Animation controllers for card entrances
   late AnimationController _headerCardController;
   late Animation<double> _headerCardAnimation;
 
@@ -29,7 +35,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
 
   late AnimationController _actionCardsController;
   late Animation<double> _actionCardsAnimation;
-
 
   @override
   void initState() {
@@ -53,7 +58,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
     );
     _actionCardsAnimation = CurvedAnimation(parent: _actionCardsController, curve: Curves.easeOut);
 
-    // Start animations sequentially or staggered
     _headerCardController.forward();
     Future.delayed(const Duration(milliseconds: 100), () => _rowCardsController.forward());
     Future.delayed(const Duration(milliseconds: 200), () => _actionCardsController.forward());
@@ -69,21 +73,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    // Define the monochromatic color palette strictly
     const Color primaryBlack = Color(0xFF000000);
     const Color primaryWhite = Color(0xFFFFFFFF);
-    const Color greyLight = Color(0xFFF5F5F5); // Very light grey for backgrounds
-    const Color greyMedium = Color(0xFFE0E0E0); // Medium grey for borders/shadows
-    const Color greyDarkText = Color(0xFF424242); // Darker grey for secondary text
-
-    // New accent color: a subtle, desaturated green
-    const Color accentGreen = Color(0xFF5A8E5C); // A muted, elegant green
+    const Color greyLight = Color(0xFFF5F5F5);
+    const Color greyMedium = Color(0xFFE0E0E0);
+    const Color greyDarkText = Color(0xFF424242);
+    const Color accentGreen = Color(0xFF5A8E5C);
 
     return Scaffold(
-      backgroundColor: primaryWhite, // Pure white background
+      backgroundColor: primaryWhite,
       appBar: AppBar(
-        elevation: 0, // No shadow
-        backgroundColor: primaryWhite, // White app bar
+        elevation: 0,
+        backgroundColor: primaryWhite,
         title: const Text(
           'Welcome 👋',
           style: TextStyle(
@@ -111,17 +112,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // --- Goal/Meal Planner Widget at the Top ---
+              // --- Today's Goal Section ---
               _sectionTitle("Today's Goal", primaryBlack),
               FadeTransition(
                 opacity: _headerCardAnimation,
                 child: SlideTransition(
                   position: Tween<Offset>(
-                    begin: const Offset(0, 0.1), // Starts slightly below
+                    begin: const Offset(0, 0.1),
                     end: Offset.zero,
                   ).animate(_headerCardAnimation),
                   child: StreamBuilder<List<Goal>>(
-                    stream: ref.watch(calorieTrackerRepositoryProvider).getCurrentGoals(), // Use ref.watch for providers
+                    stream: ref.watch(calorieTrackerRepositoryProvider).getCurrentGoals(),
                     builder: (context, goalSnap) {
                       if (goalSnap.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(primaryBlack)));
@@ -143,7 +144,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
 
                       final goal = goalSnap.data!.first;
                       return StreamBuilder<List<CalorieEntry>>(
-                        stream: ref.watch(calorieTrackerRepositoryProvider).getEntriesForDay(DateTime.now()), // Use ref.watch for providers
+                        stream: ref.watch(calorieTrackerRepositoryProvider).getEntriesForDay(DateTime.now()),
                         builder: (context, entrySnap) {
                           final entries = entrySnap.data ?? [];
                           final consumedCalories = entries.fold<double>(0, (sum, e) => sum + e.calories);
@@ -170,7 +171,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
               ),
               const SizedBox(height: 32),
 
-              // --- Recipe and Community Cards (Side-by-Side) ---
+              // --- Quick Access Cards ---
               _sectionTitle("Quick Access", primaryBlack),
               FadeTransition(
                 opacity: _rowCardsAnimation,
@@ -189,8 +190,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                           backgroundColor: greyLight,
                           iconColor: primaryBlack,
                           textColor: primaryBlack,
-                          borderColor: greyMedium, // Pass border color
-                          shadowColor: primaryBlack.withOpacity(0.08), // Pass shadow color
+                          borderColor: greyMedium,
+                          shadowColor: primaryBlack.withOpacity(0.08),
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -212,7 +213,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
               ),
               const SizedBox(height: 32),
 
-              // --- "Manage Goals" Section (Action Card) ---
+              // --- Productivity Section (Action Cards) ---
               _sectionTitle("Productivity", primaryBlack),
               FadeTransition(
                 opacity: _actionCardsAnimation,
@@ -228,32 +229,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                         icon: Icons.flag,
                         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const GoalScreen())),
                         backgroundColor: greyLight,
-                        iconColor: accentGreen, // Pop of accent color
+                        iconColor: accentGreen,
                         textColor: primaryBlack,
                         borderColor: greyMedium,
                         shadowColor: primaryBlack.withOpacity(0.08),
                       ),
-                      const SizedBox(height: 16), // Spacing between action cards
-                      // --- Calorie Tracker Section ---
+                      const SizedBox(height: 16),
                       _ActionCard(
                         label: 'Log Your Meals',
                         icon: Icons.local_fire_department,
                         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => CalorieTrackerScreen())),
                         backgroundColor: greyLight,
-                        iconColor: accentGreen, // Pop of accent color
+                        iconColor: accentGreen,
                         textColor: primaryBlack,
                         borderColor: greyMedium,
                         shadowColor: primaryBlack.withOpacity(0.08),
                       ),
-                      const SizedBox(height: 16), // Spacing between action cards
-
-                      // --- AI Recipe Builder ---
+                      const SizedBox(height: 16),
                       _ActionCard(
                         label: 'Generate Recipes with AI',
                         icon: Icons.psychology_alt,
                         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RecipeBuilderPage())),
                         backgroundColor: greyLight,
-                        iconColor: accentGreen, // Pop of accent color
+                        iconColor: accentGreen,
+                        textColor: primaryBlack,
+                        borderColor: greyMedium,
+                        shadowColor: primaryBlack.withOpacity(0.08),
+                      ),
+                      const SizedBox(height: 16), // Space before the new card
+                      // --- My Recipes Card (Added at the bottom of Productivity section) ---
+                      _ActionCard(
+                        label: 'My Recipes',
+                        icon: Icons.collections_bookmark,
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MyRecipesScreen())),
+                        backgroundColor: greyLight,
+                        iconColor: accentGreen,
                         textColor: primaryBlack,
                         borderColor: greyMedium,
                         shadowColor: primaryBlack.withOpacity(0.08),
@@ -263,9 +273,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                 ),
               ),
               const SizedBox(height: 24),
-
-              // --- Ad Banner (Optional) ---
-              const SizedBox(height: 16),
             ],
           ),
         ),
@@ -273,7 +280,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
     );
   }
 
-  // --- Helper for consistent section titles ---
   Widget _sectionTitle(String title, Color textColor) => Padding(
     padding: const EdgeInsets.only(bottom: 12.0, top: 8.0),
     child: Text(
@@ -289,7 +295,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
   );
 }
 
-// --- Reusable Card Widgets for Monochromatic Theme (Adjusted for consistency) ---
+// --- Reusable Card Widgets (As provided, ensuring consistency) ---
 
 class _InfoCard extends StatelessWidget {
   final String label;
@@ -298,8 +304,8 @@ class _InfoCard extends StatelessWidget {
   final Color backgroundColor;
   final Color iconColor;
   final Color textColor;
-  final Color borderColor; // New
-  final Color shadowColor; // New
+  final Color borderColor;
+  final Color shadowColor;
 
   const _InfoCard({
     required this.label,
@@ -360,8 +366,8 @@ class _ActionCard extends StatelessWidget {
   final Color backgroundColor;
   final Color iconColor;
   final Color textColor;
-  final Color borderColor; // New
-  final Color shadowColor; // New
+  final Color borderColor;
+  final Color shadowColor;
 
   const _ActionCard({
     required this.label,

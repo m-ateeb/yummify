@@ -7,7 +7,7 @@ import '/features/auth/presentation/screens/signup_screen.dart';
 import '/features/calorietracker/presentation/screens/calorie_tracker_screen.dart';
 import 'package:frontend/features/recipe/presentation/screens/allrecipes_screen.dart';
 import 'package:frontend/features/recipe/presentation/screens/community_recipes.dart';
-
+import 'package:frontend/features/recipe/presentation/screens/my_recipe_screen.dart';
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -27,6 +27,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const ProfileScreen());
       case '/recipe':
         return MaterialPageRoute(builder: (_)=> const AllRecipesScreen());
+      case '/my':
+        return MaterialPageRoute(builder: (_)=> const MyRecipesScreen());
       default:
         return MaterialPageRoute(
           builder: (_) => const Scaffold(
