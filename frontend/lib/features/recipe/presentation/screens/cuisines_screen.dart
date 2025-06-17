@@ -11,7 +11,7 @@ class CuisinesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final recipesAsync = ref.watch(recipesProvider);
+    final recipesAsync = ref.watch(yummifyRecipesProvider);
 
     return Scaffold(
       appBar: AppBar(

@@ -11,7 +11,7 @@ class AllRecipesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final recipesAsync = ref.watch(publicUserRecipesProvider); // 🧠 Fetch public recipes
+    final recipesAsync = ref.watch(yummifyRecipesProvider); // 🧠 Fetch public recipes
     print(recipesAsync.value);
     return Scaffold(
       appBar: AppBar(

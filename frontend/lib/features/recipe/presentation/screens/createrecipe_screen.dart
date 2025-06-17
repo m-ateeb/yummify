@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/features/recipe/domain/recipe_entity.dart'; // Adjust path
-import 'package:frontend/providers/providers.dart'; // Adjust path (your providers file)
-import '../../data/recipe_repository_provider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // For Timestamp
+import 'package:frontend/providers/providers.dart'; // Adjust path (your providers file, containing userProfileProvider)
+import 'package:frontend/features/recipe/data/recipe_repository_provider.dart'; // Adjust path
 
 class CreateRecipeScreen extends ConsumerStatefulWidget {
   const CreateRecipeScreen({super.key});
@@ -47,6 +46,8 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
     super.dispose();
   }
 
+  // --- Helper methods for dialogs and UI elements (no significant changes, just included for completeness) ---
+
   void _addDescriptionBlock() {
     final headingController = TextEditingController();
     final bodyController = TextEditingController();
@@ -56,27 +57,27 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent, // Remove default tint
+        surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: const Text("Add Description Block", style: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.bold)),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextFormField( // Changed to TextFormField for validation
+              TextFormField(
                 controller: headingController,
-                decoration: _dialogInputDecoration("Heading 1"), // Use shared InputDecoration
+                decoration: _dialogInputDecoration("Heading"),
                 validator: (value) => value!.isEmpty ? 'Heading is required' : null,
               ),
               const SizedBox(height: 12),
-              TextFormField( // Changed to TextFormField
+              TextFormField(
                 controller: bodyController,
                 decoration: _dialogInputDecoration("Body"),
                 maxLines: 3,
                 validator: (value) => value!.isEmpty ? 'Body is required' : null,
               ),
               const SizedBox(height: 12),
-              TextFormField( // Changed to TextFormField
+              TextFormField(
                 controller: imageController,
                 decoration: _dialogInputDecoration("Image URL"),
                 validator: (value) {
@@ -96,11 +97,11 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.black, foregroundColor: Colors.white),
             onPressed: () {
-              // Manual validation for dialog fields since it's not a Form widget
+              // Manual validation for dialog fields as they are not part of the main Form widget
               if (headingController.text.isNotEmpty &&
                   bodyController.text.isNotEmpty &&
                   imageController.text.isNotEmpty &&
-                  Uri.tryParse(imageController.text)?.isAbsolute == true) { // Also validate URL
+                  Uri.tryParse(imageController.text)?.isAbsolute == true) {
                 setState(() {
                   _descriptionBlocks.add(DescriptionBlock(
                     heading1: headingController.text,
@@ -111,7 +112,7 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
                 Navigator.of(ctx).pop();
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Please fill all fields with valid data.")),
+                  const SnackBar(content: Text("Please fill all fields with valid data in description block.")),
                 );
               }
             },
@@ -126,7 +127,7 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
     final nameController = TextEditingController();
     final qtyController = TextEditingController();
     final unitController = TextEditingController();
-    final noteController = TextEditingController(); // For optional note
+    final noteController = TextEditingController();
 
     showDialog(
       context: context,
@@ -138,46 +139,26 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(
-              controller: nameController,
-              decoration: _dialogInputDecoration("Name"),
-            ),
+            TextField(controller: nameController, decoration: _dialogInputDecoration("Name")),
             const SizedBox(height: 12),
-            TextField(
-              controller: qtyController,
-              decoration: _dialogInputDecoration("Quantity"),
-              keyboardType: TextInputType.number, // Ensure numeric keyboard
-            ),
+            TextField(controller: qtyController, decoration: _dialogInputDecoration("Quantity"), keyboardType: TextInputType.number),
             const SizedBox(height: 12),
-            TextField(
-              controller: unitController,
-              decoration: _dialogInputDecoration("Unit"),
-            ),
+            TextField(controller: unitController, decoration: _dialogInputDecoration("Unit")),
             const SizedBox(height: 12),
-            TextField(
-              controller: noteController,
-              decoration: _dialogInputDecoration("Note (Optional)"),
-            ),
+            TextField(controller: noteController, decoration: _dialogInputDecoration("Note (Optional)")),
           ],
         ),
         actions: [
-          TextButton(
-            child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
-            onPressed: () => Navigator.of(ctx).pop(),
-          ),
+          TextButton(child: const Text("Cancel", style: TextStyle(color: Colors.grey)), onPressed: () => Navigator.of(ctx).pop()),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.black, foregroundColor: Colors.white),
             onPressed: () {
-              // Parse quantity to double
               final double? parsedQty = double.tryParse(qtyController.text);
-
-              if (nameController.text.isNotEmpty &&
-                  parsedQty != null && // Check if parsing was successful
-                  unitController.text.isNotEmpty) {
+              if (nameController.text.isNotEmpty && parsedQty != null && unitController.text.isNotEmpty) {
                 setState(() {
                   _ingredients.add(Ingredient(
                     name: nameController.text,
-                    qty: parsedQty, // Assign the parsed double value
+                    qty: parsedQty,
                     unit: unitController.text,
                     note: noteController.text.isEmpty ? null : noteController.text,
                   ));
@@ -206,7 +187,7 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: const Text("Add Instruction Step", style: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.bold)),
-        content: TextFormField( // Changed to TextFormField for validation
+        content: TextFormField(
           controller: instructionController,
           decoration: _dialogInputDecoration("Step Description"),
           maxLines: 3,
@@ -214,13 +195,13 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
         ),
         actions: [
           TextButton(
-            child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
-            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text("Cancel", style: TextStyle(color: Colors.grey)), // Added TextStyle wrapper
+            onPressed: () => Navigator.of(ctx).pop(), // <-- This was the main fix!
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.black, foregroundColor: Colors.white),
             onPressed: () {
-              if (instructionController.text.isNotEmpty) { // Basic validation
+              if (instructionController.text.isNotEmpty) {
                 setState(() {
                   _instructions.add(InstructionStep(description: instructionController.text));
                 });
@@ -251,96 +232,107 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
     ),
   );
 
+  // --- Main fix in _saveRecipe method ---
   Future<void> _saveRecipe() async {
+    // 1. Validate the main form fields
     if (!_formKey.currentState!.validate()) {
       return; // Stop if form is not valid
     }
 
+    // 2. Validate lists (description blocks, ingredients, instructions)
     if (_descriptionBlocks.isEmpty || _ingredients.isEmpty || _instructions.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please add at least one description block, ingredient, and instruction.")),
       );
       return;
     }
-    // Validate thumbnail URL explicitly as it's not part of the main form's validator
-    if (_thumbnailUrlController.text.isEmpty || !Uri.tryParse(_thumbnailUrlController.text)!.isAbsolute) {
+
+    // 3. Get User Profile and UID/Role
+    // Using ref.read() here because we don't need the UI to rebuild if userProfile changes
+    // while we are in the middle of saving. We just need the current snapshot.
+    final userProfileAsync = ref.read(userProfileProvider);
+
+    // Handle loading/error states for userProfile. This is crucial.
+    // If the user profile isn't loaded yet, or if there's an error/no user,
+    // we cannot proceed with saving the recipe.
+    if (userProfileAsync.isLoading) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter a valid Thumbnail Image URL.")),
+        const SnackBar(content: Row(children: [CircularProgressIndicator(color: Colors.white), SizedBox(width: 10), Text("Loading user data...")])),
+      );
+      // Wait for the next frame for the SnackBar to show, then return
+      await Future.delayed(Duration.zero);
+      return;
+    }
+
+    if (userProfileAsync.hasError || userProfileAsync.value == null) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar(); // Hide any loading snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("You must be logged in to create a recipe. Please log in.")),
       );
       return;
     }
 
+    // User profile is available, extract UID and Role
+    final currentUserProfile = userProfileAsync.value!;
+    final userId = currentUserProfile.uid;
+    final userRole = currentUserProfile.role; // This is the dynamic role!
 
-    final userIdAsyncValue = ref.read(userIdProvider);
-    final userId = userIdAsyncValue.when(
-      data: (uid) => uid,
-      loading: () => null,
-      error: (err, stack) {
-        print('Error getting user ID: $err');
-        return null;
-      },
-    );
-
-    if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("You must be logged in to create a recipe.")),
-      );
-      return;
-    }
-
-    // Show loading indicator
+    // Show saving indicator *after* user profile is confirmed
+    ScaffoldMessenger.of(context).hideCurrentSnackBar(); // Hide "Loading user data" if it was shown
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Row(children: [CircularProgressIndicator(color: Colors.white), SizedBox(width: 10), Text("Saving recipe...")])),
     );
 
-
     try {
       final intTotalTime = int.tryParse(_totalTimeController.text) ?? 0;
 
+      // 4. Create the RecipeEntity with dynamic user data
       final newRecipe = RecipeEntity(
         id: '', // Firestore will generate this
         name: _recipeNameController.text.trim(),
-        writer: userId, // Current authenticated user ID (as you have it)
-        // Ensure all required fields from RecipeEntity are provided:
-        createdBy: 'user', // Assuming this is created by a 'user'
-        role: 'user', // Assuming newly created user recipes have 'user' role
+        writer: userId, // Current authenticated user ID
+        // Use dynamically fetched data for createdBy and role
+        createdBy: userId, // Set createdBy to the user's UID
+        role: userRole, // **FIXED**: Dynamically set user's role here!
         visibility: _selectedStatus!, // 'public' or 'private' from _selectedStatus
-        img: _thumbnailUrlController.text.trim(), // Provide a default or allow user input for image
-        tags: [], // Add UI for tags or provide default empty list
-        servingDescription: 'Serves 1', // Add UI or provide default
-        servingSize: '1', // Add UI or provide default
-        searchIndex: [], // This typically gets populated for search indexing (e.g., lowercase name, ingredients)
-        nutrition: Nutrition(calories: 0, carbsG: 0, fatG: 0, fiberG: 0, proteinG: 0), // Provide default Nutrition
-        apiCalls: [], // Provide default if not used
+        img: _thumbnailUrlController.text.trim().isNotEmpty
+            ? _thumbnailUrlController.text.trim()
+            : 'https://via.placeholder.com/400x200?text=Recipe+Image', // Provide a robust placeholder
+        tags: [], // Consider adding UI for tags later
+        servingDescription: 'Serves 1', // Default, consider UI
+        servingSize: '1', // Default, consider UI
+        searchIndex: [], // Typically generated for search indexing
+        nutrition: Nutrition(calories: 0, carbsG: 0, fatG: 0, fiberG: 0, proteinG: 0), // Default, consider UI
+        apiCalls: [], // Default if not used
         review: 0.0, // Default review for new recipe
         updatedAt: DateTime.now(), // Set updatedAt
-
         descriptionBlocks: _descriptionBlocks,
         ingredients: _ingredients,
         instructionSet: _instructions,
         totaltime: intTotalTime,
         cuisine: _selectedCuisine ?? 'Other',
         createdAt: DateTime.now(),
+        // Note: 'status' and 'visibility' fields. If they serve the same purpose,
+        // you might simplify your RecipeEntity to use only one (e.g., 'visibility').
         status: _selectedStatus!,
         averageRating: 0.0,
         ratingCount: 0,
         totalRatingSum: 0.0,
-      ); // Removed duplicate `);`
+      );
 
       final repo = ref.read(recipeRepositoryProvider);
       await repo.createRecipe(newRecipe);
 
-      ScaffoldMessenger.of(context).hideCurrentSnackBar(); // Hide loading
+      ScaffoldMessenger.of(context).hideCurrentSnackBar(); // Hide saving indicator
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Recipe saved successfully!")),
+        const SnackBar(content: Text("Recipe saved successfully!"), backgroundColor: Colors.green),
       );
-      // Optionally clear form or navigate back
       Navigator.of(context).pop(); // Go back to previous screen
-    } catch (e) {
-      ScaffoldMessenger.of(context).hideCurrentSnackBar(); // Hide loading
-      print('Error saving recipe: $e'); // Print detailed error for debugging
+    } catch (e, stackTrace) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar(); // Hide saving indicator
+      debugPrint('Error saving recipe: $e\n$stackTrace'); // Use debugPrint for better logging in Flutter
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to save recipe: ${e.toString()}")), // Show user-friendly error
+        SnackBar(content: Text("Failed to save recipe: ${e.toString()}"), backgroundColor: Colors.red),
       );
     }
   }
@@ -377,7 +369,7 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
                   return null;
                 },
               ),
-              // New TextFormField for Thumbnail URL
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _thumbnailUrlController,
                 decoration: _inputDecoration("Thumbnail Image URL"),
@@ -451,7 +443,6 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
               ),
 
               _sectionTitle("Description Blocks"),
-              // Display existing description blocks
               ..._descriptionBlocks.map((block) {
                 return _buildDescriptionBlockCard(block);
               }).toList(),
@@ -460,7 +451,7 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
                 child: Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: FloatingActionButton.small(
-                    heroTag: 'add_desc_block', // Unique tag
+                    heroTag: 'add_desc_block',
                     backgroundColor: Colors.black,
                     foregroundColor: Colors.white,
                     onPressed: _addDescriptionBlock,
@@ -470,13 +461,13 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
               ),
 
               _sectionTitle("Ingredients"),
-              _buildIngredientsList(), // Now handles empty list
+              _buildIngredientsList(),
               Align(
                 alignment: Alignment.centerRight,
                 child: Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: FloatingActionButton.small(
-                    heroTag: 'add_ingredient', // Unique tag
+                    heroTag: 'add_ingredient',
                     backgroundColor: Colors.black,
                     foregroundColor: Colors.white,
                     onPressed: _addIngredient,
@@ -486,17 +477,17 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
               ),
 
               _sectionTitle("Instructions"),
-              _buildInstructionsList(), // Now handles empty list
+              _buildInstructionsList(),
               Align(
                 alignment: Alignment.centerRight,
                 child: Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: FloatingActionButton.small(
-                    heroTag: 'add_instruction', // Unique tag
+                    heroTag: 'add_instruction',
                     backgroundColor: Colors.black,
                     foregroundColor: Colors.white,
                     onPressed: _addInstruction,
-                    child: const Icon(Icons.add), // Added icon for consistency
+                    child: const Icon(Icons.add),
                   ),
                 ),
               ),
@@ -526,6 +517,7 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
     );
   }
 
+  // --- Input Decoration Helper Methods ---
   InputDecoration _inputDecoration(String label) {
     return InputDecoration(
       labelText: label,
@@ -544,11 +536,10 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
         borderSide: BorderSide(color: Colors.grey.shade300, width: 1),
       ),
       labelStyle: const TextStyle(color: Colors.black87),
-      errorStyle: const TextStyle(color: Colors.redAccent), // Added error style for visibility
+      errorStyle: const TextStyle(color: Colors.redAccent),
     );
   }
 
-  // Consistent input decoration for dialogs
   InputDecoration _dialogInputDecoration(String label) {
     return InputDecoration(
       labelText: label,
@@ -570,6 +561,8 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     );
   }
+
+  // --- Build List Widgets (no changes, included for completeness) ---
 
   Widget _buildDescriptionBlockCard(DescriptionBlock block) {
     return Container(

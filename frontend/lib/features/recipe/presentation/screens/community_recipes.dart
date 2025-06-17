@@ -22,11 +22,11 @@ class _CommunityRecipeScreenState extends ConsumerState<CommunityRecipeScreen> {
   @override
   Widget build(BuildContext context) {
     // Watch the providers for different recipe lists
-    final featuredRecipesAsync = ref.watch(featuredRecipesProvider);
-    final newRecipesAsync = ref.watch(newRecipesProvider);
+    final featuredRecipesAsync = ref.watch(featuredCommunityRecipesProvider);
+    final newRecipesAsync = ref.watch(newCommunityRecipesProvider);
 
     // Watch the cuisine filtered recipes
-    final recipesByCuisineAsync = ref.watch(recipesByCuisineProvider(_selectedCuisineFilter));
+    final recipesByCuisineAsync = ref.watch(communityRecipesByCuisineProvider(_selectedCuisineFilter));
 
     final List<String> cuisineCategories = [
       'All', 'Italian', 'Mexican', 'Indian', 'Chinese', 'Japanese', 'Thai',
