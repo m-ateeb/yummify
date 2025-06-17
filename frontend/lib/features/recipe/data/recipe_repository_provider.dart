@@ -84,29 +84,39 @@ final publicCommunityRecipesProvider = FutureProvider<List<RecipeEntity>>((ref) 
 
 /// Provider for "My Recipes Page" - Recipes created by the current logged-in user (public or private)
 /// This needs the current user's ID.
-// final myRecipesProvider = FutureProvider<List<RecipeEntity>>((ref) async {
-//   log('Provider: myRecipesProvider - Fetching recipes for My Recipes page...');
-//   final repo = ref.read(recipeRepositoryProvider);
-//   final userId = await ref.watch(userIdProvider.future); // Get current user ID
-//
-//   if (userId == null) {
-//     log('Provider: myRecipesProvider - No user logged in, returning empty list.');
-//     return [];
-//   }
-//   log('Provider: myRecipesProvider - Current User ID: $userId');
-//
-//   final allRecipes = await repo.getRecipes(); // This fetches ALL recipes
-//   log('Provider: myRecipesProvider - Fetched ${allRecipes.length} raw recipes.');
-//
-//   final filteredRecipes = allRecipes.where((r) {
-//     final isMyRecipe = r.writer == userId;
-//     log('  Recipe Name: ${r.name}, ID: ${r.id}, Writer: ${r.writer} (isMyRecipe: $isMyRecipe)');
-//     return isMyRecipe;
-//   }).toList();
-//
-//   log('Provider: myRecipesProvider - Filtered to ${filteredRecipes.length} user recipes.');
-//   return filteredRecipes;
-// });
+/// This needs the current user's ID.
+final myRecipesProvider = FutureProvider<List<RecipeEntity>>((ref) async {
+  log('Provider: myRecipesProvider - Fetching recipes for My Recipes page...');
+
+  // 1. Get the userId using ref.watch and access its value
+  //    This will automatically re-run the provider when userId changes (login/logout)
+  final userId = ref.watch(userIdProvider).value; // <--- The simpler way to get the value
+
+  if (userId == null) {
+    log('Provider: myRecipesProvider - No user logged in, returning empty list.');
+    return [];
+  }
+  log('Provider: myRecipesProvider - Current User ID: $userId');
+
+  // 2. Get the repository instance
+  final repo = ref.read(recipeRepositoryProvider);
+
+  // 3. Fetch ALL recipes from the repository
+  //    (As per your original commented code, this implies getRecipes() fetches all)
+  final allRecipes = await repo.getRecipes();
+  log('Provider: myRecipesProvider - Fetched ${allRecipes.length} raw recipes from repository.');
+
+  // 4. Filter them in-memory by the current user's ID
+  final filteredRecipes = allRecipes.where((r) {
+    final isMyRecipe = r.writer == userId;
+    // log('  Recipe Name: ${r.name}, ID: ${r.id}, Writer: ${r.writer} (isMyRecipe: $isMyRecipe)'); // Optional: for detailed debugging
+    return isMyRecipe;
+  }).toList();
+
+  log('Provider: myRecipesProvider - Filtered to ${filteredRecipes.length} user recipes.');
+  return filteredRecipes;
+});
+
 
 
 // --- DEPENDENT PROVIDERS (NOW WATCHING THE CORRECT BASE PROVIDER) ---

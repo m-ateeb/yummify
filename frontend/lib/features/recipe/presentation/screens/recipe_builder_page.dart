@@ -7,6 +7,7 @@ import 'package:frontend/providers/providers.dart'; // Import your actual provid
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart'; // Required for generating UUID for new RecipeEntity
 
+
 class RecipeBuilderPage extends ConsumerStatefulWidget {
   const RecipeBuilderPage({super.key});
 

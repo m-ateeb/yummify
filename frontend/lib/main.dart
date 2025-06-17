@@ -2,36 +2,20 @@
   import 'package:flutter/services.dart';
   import 'package:firebase_core/firebase_core.dart';
   import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+  import 'package:flutter_riverpod/flutter_riverpod.dart';
   import 'firebase_options.dart';
   import 'router/app_router.dart';
   import 'core/theme/app_theme.dart';
   import 'package:cloud_firestore/cloud_firestore.dart';
   import 'package:firebase_auth/firebase_auth.dart';
-  import 'package:google_fonts/google_fonts.dart';
   import 'home_screen.dart';
-  import 'features/cookbook/presentation/screens/cookbook_screen.dart';
+  import 'features/recipe/presentation/screens/allrecipes_screen.dart';
   import 'features/calorietracker/presentation/screens/calorie_tracker_screen.dart';
   import 'features/user/presentation/screens/profile_screen.dart';
   import 'features/auth/presentation/screens/login_screen.dart';
-import 'package:firebase_messaging/firebase_messaging.dart' show FirebaseMessaging;
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
-import 'router/app_router.dart';
-import 'core/theme/app_theme.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-//import 'package:flutter_native_splash/android.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'home_screen.dart';
-import 'features/cookbook/presentation/screens/cookbook_screen.dart';
-import 'features/calorietracker/presentation/screens/calorie_tracker_screen.dart';
-import 'features/user/presentation/screens/profile_screen.dart';
-import 'features/auth/presentation/screens/login_screen.dart';
-import './core/services/notification_service.dart';
+  import 'package:firebase_messaging/firebase_messaging.dart' show FirebaseMessaging;
+  import 'package:google_mobile_ads/google_mobile_ads.dart';
+  import './core/services/notification_service.dart';
 
   void main() async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -146,6 +130,7 @@ import './core/services/notification_service.dart';
     State<MainNavigationScreen> createState() => _MainNavigationScreenState();
   }
 
+// bottom navbar
   class _MainNavigationScreenState extends State<MainNavigationScreen>
       with SingleTickerProviderStateMixin {
     int _currentIndex = 0;
@@ -153,7 +138,7 @@ import './core/services/notification_service.dart';
 
     final List<Widget> _screens = [
       const HomeScreen(),
-      const CookbookScreen(),
+      const AllRecipesScreen(),
       const CalorieTrackerScreen(),
       const ProfileScreen(),
     ];

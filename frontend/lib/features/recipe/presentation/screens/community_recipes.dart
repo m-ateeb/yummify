@@ -29,7 +29,7 @@ class _CommunityRecipeScreenState extends ConsumerState<CommunityRecipeScreen> {
     final recipesByCuisineAsync = ref.watch(communityRecipesByCuisineProvider(_selectedCuisineFilter));
 
     final List<String> cuisineCategories = [
-      'All', 'Italian', 'Mexican', 'Indian', 'Chinese', 'Japanese', 'Thai',
+      'All', 'Italian', 'Mexican', 'Indian', 'Asian','Japanese',
       'French', 'American', 'Mediterranean', 'Other'
     ];
 
