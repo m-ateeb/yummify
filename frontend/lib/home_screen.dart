@@ -10,6 +10,7 @@ import 'features/calorietracker/presentation/screens/goal_screen.dart';
 import 'features/calorietracker/presentation/screens/set_goal_screen.dart';
 import '/features/calorietracker/domain/calorie_entry.dart';
 import 'shared/widgets/banner_ad.dart';
+import 'shared/widgets/custom_bottom_bar.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);

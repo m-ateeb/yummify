@@ -6,7 +6,6 @@ import '/core/services/firebase_authservice.dart';
 import '/core/constants/app_strings.dart';
 import '/core/theme/app_theme.dart';
 import '/features/auth/presentation/screens/signup_screen.dart';
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -200,7 +199,17 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               TextButton(
                 onPressed: () async {
-                  final email = emailController.text.trim();
+                  final email = emailController.text.trim().toLowerCase();
+                  print('[📧] Normalized email for Firebase lookup: "$email"');
+                  print('Email runes: ${email.runes.toList()}');
+                  final methods = await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
+                  print('[🔍] Sign-in methods for "$email": $methods');
+
+
+                  if (email.isEmpty) {
+                    setState(() => errorMessage = 'Please enter your email address.');
+                    return;
+                  }
 
                   if (!emailRegex.hasMatch(email)) {
                     setState(() => errorMessage = 'Please enter a valid email address.');
@@ -226,7 +235,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       return;
                     }
 
-                    await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+                    final error = await _authService.sendPasswordResetIfUserExists(email);
+                    if (error != null) {
+                      setState(() {
+                        errorMessage = error;
+                        isCheckingEmail = false;
+                      });
+                      return;
+                    }
                     Navigator.of(dialogContext).pop('success');
                   } catch (e) {
                     setState(() {

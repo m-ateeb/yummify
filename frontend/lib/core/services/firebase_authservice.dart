@@ -69,7 +69,7 @@ class FirebaseAuthService {
 
 
 
-  // Existing functions...
+  // create user
 
   Future<void> createUserInFirestore(User? user) async {
   if (user == null) return;
@@ -96,4 +96,58 @@ class FirebaseAuthService {
   User? getCurrentUser() {
     return _firebaseAuth.currentUser;
   }
+
+  //forgot password
+  Future<String?> sendPasswordResetLink(String email) async {
+    try {
+      final methods = await _firebaseAuth.fetchSignInMethodsForEmail(email);
+
+      if (methods.isEmpty) {
+        return 'No account found for this email.';
+      } else if (!methods.contains('password')) {
+        return 'This email is registered with a different sign-in method.';
+      }
+
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+      return null; // null means success
+    } catch (e) {
+      print('Reset password error: $e');
+      return 'Failed to send reset link. Please try again later.';
+    }
+  }
+
+  Future<String?> sendPasswordResetIfUserExists(String email) async {
+    try {
+      // Step 1: Check Firestore for a user document with this email
+      final userQuery = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+
+      print('📦 Firestore query results: ${userQuery.docs.length}');
+      if (userQuery.docs.isNotEmpty) {
+        print('📧 Found user: ${userQuery.docs.first.data()}');
+      }
+      if (userQuery.docs.isEmpty) {
+        return 'No user found with this email in our system.';
+      }
+
+      // Step 2: Check auth methods
+      final methods = await _firebaseAuth.fetchSignInMethodsForEmail(email);
+
+      if (!methods.contains('password')) {
+        return 'This account uses a different sign-in method (e.g. Google).';
+      }
+
+      // Step 3: Send reset email
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+      return null; // null = success
+    } catch (e) {
+      print('Password reset error: $e');
+      return 'Something went wrong. Please try again.';
+    }
+  }
+
+
 }
