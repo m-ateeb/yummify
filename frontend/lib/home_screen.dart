@@ -86,7 +86,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
         elevation: 0,
         backgroundColor: primaryWhite,
         title: const Text(
-          'Welcome 👋',
+          'Welcome  👋',
           style: TextStyle(
             fontFamily: 'Montserrat',
             fontWeight: FontWeight.bold,
@@ -94,17 +94,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
             fontSize: 24,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.person, color: primaryBlack),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ProfileScreen()),
-              );
-            },
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.person, color: primaryBlack),
+        //     onPressed: () {
+        //       Navigator.push(
+        //         context,
+        //         MaterialPageRoute(builder: (_) => const ProfileScreen()),
+        //       );
+        //     },
+        //   ),
+        // ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(

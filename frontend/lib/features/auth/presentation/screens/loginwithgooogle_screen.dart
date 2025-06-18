@@ -13,22 +13,6 @@ class LoginWithGoogleScreen extends StatefulWidget {
 class _LoginWithGoogleScreenState extends State<LoginWithGoogleScreen> {
   bool _isLoading = false;
   String? _error;
-  Future<GoogleSignInAccount?> _forceGoogleAccountSelection() async {
-    final googleSignIn = GoogleSignIn(
-      scopes: ['email'],
-    );
-
-    // Step 1: If signed in silently, disconnect to clear session
-    final existingUser = await googleSignIn.signInSilently();
-    if (existingUser != null) {
-      await googleSignIn.disconnect();
-      await Future.delayed(const Duration(milliseconds: 500));
-    }
-
-    // Step 2: Now call signIn to prompt account selection
-    return await googleSignIn.signIn();
-  }
-
 
   Future<void> _handleSignInWithGoogle() async {
     setState(() {
@@ -37,10 +21,14 @@ class _LoginWithGoogleScreenState extends State<LoginWithGoogleScreen> {
     });
 
     try {
-      final account = await _forceGoogleAccountSelection();
+      final googleSignIn = GoogleSignIn(scopes: ['email']);
+      await googleSignIn.disconnect();
+
+      final account = await googleSignIn.signIn();
 
       if (account == null) {
         setState(() {
+          _isLoading = false;
           _error = 'Sign in canceled by user.';
         });
         return;
@@ -56,10 +44,8 @@ class _LoginWithGoogleScreenState extends State<LoginWithGoogleScreen> {
       final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
       final User? user = userCredential.user;
 
-      // Check if it's a new user
       final isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
 
-      // Save user info to Firestore if new
       if (isNewUser && user != null) {
         await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
           'uid': user.uid,
@@ -77,6 +63,7 @@ class _LoginWithGoogleScreenState extends State<LoginWithGoogleScreen> {
               ? 'Signed up as ${user?.displayName ?? user?.email}'
               : 'Signed in as ${user?.displayName ?? user?.email}')),
         );
+        Navigator.of(context).pushNamedAndRemoveUntil('/main', (route) => false);
       }
     } catch (e) {
       setState(() {

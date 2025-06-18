@@ -1,0 +1,1594 @@
+[
+  {
+    "id": "recipe_001",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Spaghetti Bolognese",
+    "img": "https://img.taste.com.au/VFkGwzXU/w720-h480-cfill-q80/taste/2016/11/spaghetti-bolognese-106560-1.jpeg",
+    "totaltime": 45,
+    "writer": "Chef AI",
+    "tags": ["italian", "pasta", "beef"],
+    "cuisine": "Italian",
+    "status": "public",
+    "serving_description": "Serves 4 people",
+    "serving_size": "4",
+    "searchIndex": ["spaghetti", "bolognese", "pasta", "italian", "beef"],
+    "ingredients": [
+      {"qty": 500, "unit": "g", "name": "spaghetti"},
+      {"qty": 250, "unit": "g", "name": "ground beef"},
+      {"qty": 1, "unit": "cup", "name": "tomato sauce", "note": "preferably homemade"}
+    ],
+    "descriptionBlocks": [
+      {
+        "heading1": "A Classic Italian Favorite",
+        "body": "This spaghetti bolognese recipe brings comfort and flavor to your dinner table.",
+        "img": "https://img.taste.com.au/VFkGwzXU/w720-h480-cfill-q80/taste/2016/11/spaghetti-bolognese-106560-1.jpeg"
+      }
+    ],
+    "instructionSet": [
+      {"description": "Boil water and cook spaghetti until al dente."},
+      {"description": "Brown the beef in a pan, then add tomato sauce and simmer."},
+      {"description": "Combine spaghetti with the sauce and serve hot."}
+    ],
+    "nutrition": {
+      "calories": 600,
+      "carbs_g": 70,
+      "fat_g": 20,
+      "fiber_g": 5,
+      "protein_g": 25
+    },
+    "review": 4.5,
+    "averageRating": 4.4,
+    "ratingCount": 12
+  },
+  {
+    "id": "recipe_002",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Margherita Pizza",
+    "img": "https://safrescobaldistatic.blob.core.windows.net/media/2022/11/PIZZA-MARGHERITA.jpg",
+    "totaltime": 30,
+    "writer": "Chef AI",
+    "tags": ["italian", "pizza", "vegetarian"],
+    "cuisine": "Italian",
+    "status": "published",
+    "serving_description": "Serves 2 people",
+    "serving_size": "2",
+    "searchIndex": ["pizza", "margherita", "italian", "cheese", "tomato"],
+    "ingredients": [
+      {"qty": 1, "unit": "piece", "name": "pizza dough"},
+      {"qty": 100, "unit": "g", "name": "mozzarella cheese"},
+      {"qty": 0.5, "unit": "cup", "name": "tomato sauce"}
+    ],
+    "instructionSet": [
+      {"description": "Roll out the pizza dough."},
+      {"description": "Spread tomato sauce and add cheese."},
+      {"description": "Bake at 220°C for 12-15 minutes."}
+    ],
+    "nutrition": {
+      "calories": 800,
+      "carbs_g": 90,
+      "fat_g": 35,
+      "fiber_g": 4,
+      "protein_g": 30
+    },
+    "review": 4.7,
+    "averageRating": 4.6,
+    "ratingCount": 15
+  },
+  {
+    "id": "recipe_003",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Risotto Milanese",
+    "img": "https://safrescobaldistatic.blob.core.windows.net/media/2022/11/RISOTTO-ALLA-MILANESE.jpg",
+    "totaltime": 40,
+    "writer": "Chef AI",
+    "tags": ["italian", "rice", "saffron"],
+    "cuisine": "Italian",
+    "status": "public",
+    "serving_description": "Serves 3 people",
+    "serving_size": "3",
+    "searchIndex": ["risotto", "milanese", "italian", "saffron"],
+    "ingredients": [
+      {"qty": 300, "unit": "g", "name": "arborio rice"},
+      {"qty": 1, "unit": "pinch", "name": "saffron"},
+      {"qty": 1, "unit": "liter", "name": "chicken stock"}
+    ],
+    "instructionSet": [
+      {"description": "Toast rice in butter."},
+      {"description": "Gradually add stock while stirring."},
+      {"description": "Add saffron for color and flavor."}
+    ],
+    "nutrition": {
+      "calories": 550,
+      "carbs_g": 80,
+      "fat_g": 15,
+      "fiber_g": 3,
+      "protein_g": 10
+    },
+    "review": 4.3,
+    "averageRating": 4.2,
+    "ratingCount": 8
+  },
+  {
+    "id": "recipe_004",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Tiramisu",
+    "img": "https://tastesbetterfromscratch.com/wp-content/uploads/2017/04/Tiramisu-15-500x500.jpg",
+    "totaltime": 120,
+    "writer": "Chef AI",
+    "tags": ["italian", "dessert", "coffee"],
+    "cuisine": "Italian",
+    "status": "public",
+    "serving_description": "Serves 6 people",
+    "serving_size": "6",
+    "searchIndex": ["tiramisu", "dessert", "italian", "coffee"],
+    "ingredients": [
+      {"qty": 250, "unit": "g", "name": "mascarpone cheese"},
+      {"qty": 24, "unit": "piece", "name": "ladyfinger cookies"},
+      {"qty": 2, "unit": "cup", "name": "strong coffee"}
+    ],
+    "instructionSet": [
+      {"description": "Dip ladyfingers in coffee."},
+      {"description": "Layer with mascarpone mixture."},
+      {"description": "Chill for at least 4 hours."}
+    ],
+    "nutrition": {
+      "calories": 450,
+      "carbs_g": 40,
+      "fat_g": 25,
+      "fiber_g": 1,
+      "protein_g": 8
+    },
+    "review": 4.8,
+    "averageRating": 4.7,
+    "ratingCount": 20
+  },
+  {
+    "id": "recipe_005",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Fettuccine Alfredo",
+    "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkizskhSC12QYI3ApvmQdJ-ddmGyKXSUWxCw&s",
+    "totaltime": 25,
+    "writer": "Chef AI",
+    "tags": ["italian", "pasta", "cream"],
+    "cuisine": "Italian",
+    "status": "public",
+    "serving_description": "Serves 2 people",
+    "serving_size": "2",
+    "searchIndex": ["fettuccine", "alfredo", "pasta", "cream"],
+    "ingredients": [
+      {"qty": 300, "unit": "g", "name": "fettuccine"},
+      {"qty": 200, "unit": "ml", "name": "heavy cream"},
+      {"qty": 100, "unit": "g", "name": "parmesan cheese"}
+    ],
+    "instructionSet": [
+      {"description": "Cook pasta al dente."},
+      {"description": "Make creamy sauce with butter, cream and cheese."},
+      {"description": "Toss pasta with sauce."}
+    ],
+    "nutrition": {
+      "calories": 750,
+      "carbs_g": 65,
+      "fat_g": 45,
+      "fiber_g": 3,
+      "protein_g": 20
+    },
+    "review": 4.6,
+    "averageRating": 4.5,
+    "ratingCount": 18
+  },
+  {
+    "id": "recipe_006",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Chicken Tacos",
+    "img": "https://hips.hearstapps.com/hmg-prod/images/chicken-tacos-index-659443ccdaac5.jpg?crop=0.502xw:1.00xh;0.441xw,0&resize=1200:*",
+    "totaltime": 30,
+    "writer": "Chef AI",
+    "tags": ["mexican", "tacos", "chicken"],
+    "cuisine": "Mexican",
+    "status": "public",
+    "serving_description": "Serves 3 people",
+    "serving_size": "3",
+    "searchIndex": ["tacos", "chicken", "mexican", "avocado"],
+    "ingredients": [
+      {"qty": 6, "unit": "piece", "name": "corn tortillas"},
+      {"qty": 300, "unit": "g", "name": "chicken breast"},
+      {"qty": 1, "unit": "cup", "name": "salsa"}
+    ],
+    "instructionSet": [
+      {"description": "Season and cook chicken."},
+      {"description": "Warm tortillas."},
+      {"description": "Assemble with toppings."}
+    ],
+    "nutrition": {
+      "calories": 400,
+      "carbs_g": 35,
+      "fat_g": 12,
+      "fiber_g": 5,
+      "protein_g": 30
+    },
+    "review": 4.4,
+    "averageRating": 4.3,
+    "ratingCount": 10
+  },
+  {
+    "id": "recipe_007",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Beef Enchiladas",
+    "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaedNrBHFP9o04D5FY_qXW9G5WYrvHIT18hg&s",
+    "totaltime": 50,
+    "writer": "Chef AI",
+    "tags": ["mexican", "enchiladas", "beef"],
+    "cuisine": "Mexican",
+    "status": "public",
+    "serving_description": "Serves 4 people",
+    "serving_size": "4",
+    "searchIndex": ["enchiladas", "beef", "mexican", "cheese"],
+    "ingredients": [
+      {"qty": 8, "unit": "piece", "name": "corn tortillas"},
+      {"qty": 400, "unit": "g", "name": "ground beef"},
+      {"qty": 2, "unit": "cup", "name": "enchilada sauce"}
+    ],
+    "instructionSet": [
+      {"description": "Cook beef with spices."},
+      {"description": "Roll in tortillas with cheese."},
+      {"description": "Bake with sauce."}
+    ],
+    "nutrition": {
+      "calories": 550,
+      "carbs_g": 45,
+      "fat_g": 25,
+      "fiber_g": 6,
+      "protein_g": 35
+    },
+    "review": 4.5,
+    "averageRating": 4.4,
+    "ratingCount": 12
+  },
+  {
+    "id": "recipe_008",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Chiles Rellenos",
+    "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMvemcttqqt0QllLRm2aCFkX5dlkKZZFYC1g&s",
+    "totaltime": 60,
+    "writer": "Chef AI",
+    "tags": ["mexican", "peppers", "cheese"],
+    "cuisine": "Mexican",
+    "status": "public",
+    "serving_description": "Serves 4 people",
+    "serving_size": "4",
+    "searchIndex": ["chiles", "rellenos", "mexican", "stuffed"],
+    "ingredients": [
+      {"qty": 4, "unit": "piece", "name": "poblano peppers"},
+      {"qty": 200, "unit": "g", "name": "queso fresco"},
+      {"qty": 4, "unit": "piece", "name": "eggs"}
+    ],
+    "instructionSet": [
+      {"description": "Roast and peel peppers."},
+      {"description": "Stuff with cheese."},
+      {"description": "Batter and fry."}
+    ],
+    "nutrition": {
+      "calories": 350,
+      "carbs_g": 20,
+      "fat_g": 18,
+      "fiber_g": 4,
+      "protein_g": 22
+    },
+    "review": 4.6,
+    "averageRating": 4.5,
+    "ratingCount": 8
+  },
+  {
+    "id": "recipe_009",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Guacamole",
+    "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSzmvmXVoOn4sc0e6pfCksTS-KLypIo2D49zw&s",
+    "totaltime": 15,
+    "writer": "Chef AI",
+    "tags": ["mexican", "dip", "avocado"],
+    "cuisine": "Mexican",
+    "status": "public",
+    "serving_description": "Serves 4 people",
+    "serving_size": "4",
+    "searchIndex": ["guacamole", "avocado", "dip", "mexican"],
+    "ingredients": [
+      {"qty": 3, "unit": "piece", "name": "avocados"},
+      {"qty": 1, "unit": "piece", "name": "lime"},
+      {"qty": 0.5, "unit": "cup", "name": "diced tomato"}
+    ],
+    "instructionSet": [
+      {"description": "Mash avocados."},
+      {"description": "Mix with lime juice and seasonings."},
+      {"description": "Add tomatoes and onions."}
+    ],
+    "nutrition": {
+      "calories": 200,
+      "carbs_g": 10,
+      "fat_g": 18,
+      "fiber_g": 7,
+      "protein_g": 2
+    },
+    "review": 4.7,
+    "averageRating": 4.6,
+    "ratingCount": 25
+  },
+ 
+  {
+    "id": "recipe_011",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Butter Chicken",
+    "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcVwgbnqxg2ecOMsrUT81WC5KCJecoHzNJNw&s",
+    "totaltime": 60,
+    "writer": "Chef AI",
+    "tags": ["indian", "chicken", "curry"],
+    "cuisine": "Indian",
+    "status": "public",
+    "serving_description": "Serves 4 people",
+    "serving_size": "4",
+    "searchIndex": ["butter", "chicken", "indian", "curry"],
+    "ingredients": [
+      {"qty": 500, "unit": "g", "name": "chicken thighs"},
+      {"qty": 1, "unit": "cup", "name": "tomato puree"},
+      {"qty": 0.5, "unit": "cup", "name": "heavy cream"}
+    ],
+    "instructionSet": [
+      {"description": "Marinate chicken in yogurt and spices."},
+      {"description": "Cook in tomato-based sauce."},
+      {"description": "Finish with cream and butter."}
+    ],
+    "nutrition": {
+      "calories": 550,
+      "carbs_g": 15,
+      "fat_g": 35,
+      "fiber_g": 3,
+      "protein_g": 40
+    },
+    "review": 4.7,
+    "averageRating": 4.6,
+    "ratingCount": 20
+  },
+  {
+    "id": "recipe_012",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Palak Paneer",
+    "img": "https://www.chefajaychopra.com/assets/img/recipe/1-1666433552palakpaneer1webp.webp",
+    "totaltime": 45,
+    "writer": "Chef AI",
+    "tags": ["indian", "vegetarian", "spinach"],
+    "cuisine": "Indian",
+    "status": "public",
+    "serving_description": "Serves 3 people",
+    "serving_size": "3",
+    "searchIndex": ["palak", "paneer", "indian", "spinach"],
+    "ingredients": [
+      {"qty": 300, "unit": "g", "name": "paneer"},
+      {"qty": 500, "unit": "g", "name": "spinach"},
+      {"qty": 2, "unit": "tbsp", "name": "ginger-garlic paste"}
+    ],
+    "instructionSet": [
+      {"description": "Blanch and puree spinach."},
+      {"description": "Cook with spices and paneer."},
+      {"description": "Finish with cream."}
+    ],
+    "nutrition": {
+      "calories": 350,
+      "carbs_g": 12,
+      "fat_g": 25,
+      "fiber_g": 5,
+      "protein_g": 20
+    },
+    "review": 4.5,
+    "averageRating": 4.4,
+    "ratingCount": 15
+  },
+  {
+    "id": "recipe_013",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Chana Masala",
+    "img": "https://images.immediate.co.uk/production/volatile/sites/30/2020/08/chana-masala-fb809bc.jpg",
+    "totaltime": 40,
+    "writer": "Chef AI",
+    "tags": ["indian", "vegetarian", "chickpeas"],
+    "cuisine": "Indian",
+    "status": "public",
+    "serving_description": "Serves 4 people",
+    "serving_size": "4",
+    "searchIndex": ["chana", "masala", "indian", "chickpeas"],
+    "ingredients": [
+      {"qty": 2, "unit": "can", "name": "chickpeas"},
+      {"qty": 2, "unit": "tbsp", "name": "chana masala spice mix"},
+      {"qty": 1, "unit": "cup", "name": "tomato puree"}
+    ],
+    "instructionSet": [
+      {"description": "Sauté onions and spices."},
+      {"description": "Add tomatoes and chickpeas."},
+      {"description": "Simmer until flavorful."}
+    ],
+    "nutrition": {
+      "calories": 300,
+      "carbs_g": 45,
+      "fat_g": 8,
+      "fiber_g": 12,
+      "protein_g": 12
+    },
+    "review": 4.6,
+    "averageRating": 4.5,
+    "ratingCount": 18
+  },
+  {
+    "id": "recipe_014",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Biryani",
+    "img": "https://www.spiceandcolour.com/wp-content/uploads/2020/06/receta-presentacion-biryani-de-pollo-01.jpg",
+    "totaltime": 90,
+    "writer": "Chef AI",
+    "tags": ["indian", "rice", "meat"],
+    "cuisine": "Indian",
+    "status": "public",
+    "serving_description": "Serves 6 people",
+    "serving_size": "6",
+    "searchIndex": ["biryani", "rice", "indian", "spiced"],
+    "ingredients": [
+      {"qty": 500, "unit": "g", "name": "basmati rice"},
+      {"qty": 500, "unit": "g", "name": "chicken"},
+      {"qty": 2, "unit": "tbsp", "name": "biryani masala"}
+    ],
+    "instructionSet": [
+      {"description": "Marinate chicken with spices."},
+      {"description": "Parboil rice."},
+      {"description": "Layer and cook dum style."}
+    ],
+    "nutrition": {
+      "calories": 600,
+      "carbs_g": 80,
+      "fat_g": 15,
+      "fiber_g": 5,
+      "protein_g": 35
+    },
+    "review": 4.8,
+    "averageRating": 4.7,
+    "ratingCount": 25
+  },
+  {
+    "id": "recipe_015",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Samosa",
+    "img": "https://c.ndtvimg.com/2023-03/0m65kep_samosa_625x300_10_March_23.jpg",
+    "totaltime": 60,
+    "writer": "Chef AI",
+    "tags": ["indian", "snack", "vegetarian"],
+    "cuisine": "Indian",
+    "status": "public",
+    "serving_description": "Makes 12 pieces",
+    "serving_size": "12",
+    "searchIndex": ["samosa", "snack", "indian", "fried"],
+    "ingredients": [
+      {"qty": 2, "unit": "cup", "name": "all-purpose flour"},
+      {"qty": 2, "unit": "cup", "name": "spiced potato filling"},
+      {"qty": 1, "unit": "liter", "name": "oil for frying"}
+    ],
+    "instructionSet": [
+      {"description": "Make dough and filling."},
+      {"description": "Shape into triangles."},
+      {"description": "Deep fry until golden."}
+    ],
+    "nutrition": {
+      "calories": 200,
+      "carbs_g": 25,
+      "fat_g": 10,
+      "fiber_g": 3,
+      "protein_g": 3
+    },
+    "review": 4.7,
+    "averageRating": 4.6,
+    "ratingCount": 30
+  },
+  {
+    "id": "recipe_016",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Pad Thai",
+    "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtske7whXfO8BQZO_mtWF5nPD0gq3e2Mq5zQ&sg",
+    "totaltime": 30,
+    "writer": "Chef AI",
+    "tags": ["asian", "noodles", "stir-fry"],
+    "cuisine": "Asian",
+    "status": "public",
+    "serving_description": "Serves 2 people",
+    "serving_size": "2",
+    "searchIndex": ["pad", "thai", "noodles", "asian"],
+    "ingredients": [
+      {"qty": 200, "unit": "g", "name": "rice noodles"},
+      {"qty": 100, "unit": "g", "name": "tofu"},
+      {"qty": 2, "unit": "tbsp", "name": "tamarind paste"}
+    ],
+    "instructionSet": [
+      {"description": "Soak noodles."},
+      {"description": "Stir-fry with sauce and ingredients."},
+      {"description": "Garnish with peanuts."}
+    ],
+    "nutrition": {
+      "calories": 500,
+      "carbs_g": 70,
+      "fat_g": 15,
+      "fiber_g": 4,
+      "protein_g": 15
+    },
+    "review": 4.6,
+    "averageRating": 4.5,
+    "ratingCount": 18
+  },
+  {
+    "id": "recipe_017",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Beef Pho",
+    "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTA7PB3CE2c7hVat-J-eHZMZ0zDZ-wd_6tSmg&s",
+    "totaltime": 180,
+    "writer": "Chef AI",
+    "tags": ["asian", "soup", "noodles"],
+    "cuisine": "Asian",
+    "status": "public",
+    "serving_description": "Serves 4 people",
+    "serving_size": "4",
+    "searchIndex": ["pho", "beef", "vietnamese", "noodles"],
+    "ingredients": [
+      {"qty": 1, "unit": "kg", "name": "beef bones"},
+      {"qty": 300, "unit": "g", "name": "rice noodles"},
+      {"qty": 2, "unit": "piece", "name": "star anise"}
+    ],
+    "instructionSet": [
+      {"description": "Simmer bones for broth."},
+      {"description": "Prepare noodles and toppings."},
+      {"description": "Assemble bowls."}
+    ],
+    "nutrition": {
+      "calories": 450,
+      "carbs_g": 50,
+      "fat_g": 10,
+      "fiber_g": 2,
+      "protein_g": 35
+    },
+    "review": 4.7,
+    "averageRating": 4.6,
+    "ratingCount": 15
+  },
+  {
+    "id": "recipe_018",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Korean BBQ",
+    "img": "https://hips.hearstapps.com/vidthumb/images/korean-bbq-chicken-skewers-644164f0b56bc.jpg?crop=1xw:1xh;center,top&resize=1200:*",
+    "totaltime": 45,
+    "writer": "Chef AI",
+    "tags": ["asian", "meat", "grill"],
+    "cuisine": "Asian",
+    "status": "public",
+    "serving_description": "Serves 4 people",
+    "serving_size": "4",
+    "searchIndex": ["korean", "bbq", "grill", "meat"],
+    "ingredients": [
+      {"qty": 800, "unit": "g", "name": "short ribs"},
+      {"qty": 0.5, "unit": "cup", "name": "soy sauce"},
+      {"qty": 2, "unit": "tbsp", "name": "sesame oil"}
+    ],
+    "instructionSet": [
+      {"description": "Marinate meat."},
+      {"description": "Grill at table."},
+      {"description": "Serve with sides."}
+    ],
+    "nutrition": {
+      "calories": 600,
+      "carbs_g": 15,
+      "fat_g": 35,
+      "fiber_g": 2,
+      "protein_g": 50
+    },
+    "review": 4.8,
+    "averageRating": 4.7,
+    "ratingCount": 20
+  },
+  {
+    "id": "recipe_019",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Dumplings",
+    "img": "https://mojo.generalmills.com/api/public/content/LYKOe2w4E0SXzLzbBysmmw_gmi_hi_res_jpeg.jpeg?v=0d3298f4&t=466b54bb264e48b199fc8e83ef1136b4",
+    "totaltime": 60,
+    "writer": "Chef AI",
+    "tags": ["asian", "dumplings", "pork"],
+    "cuisine": "Asian",
+    "status": "public",
+    "serving_description": "Makes 24 pieces",
+    "serving_size": "24",
+    "searchIndex": ["dumplings", "steamed", "asian", "pork"],
+    "ingredients": [
+      {"qty": 24, "unit": "piece", "name": "dumpling wrappers"},
+      {"qty": 300, "unit": "g", "name": "ground pork"},
+      {"qty": 2, "unit": "cup", "name": "chopped cabbage"}
+    ],
+    "instructionSet": [
+      {"description": "Make filling."},
+      {"description": "Wrap in dough."},
+      {"description": "Steam or pan-fry."}
+    ],
+    "nutrition": {
+      "calories": 80,
+      "carbs_g": 10,
+      "fat_g": 3,
+      "fiber_g": 1,
+      "protein_g": 5
+    },
+    "review": 4.7,
+    "averageRating": 4.6,
+    "ratingCount": 25
+  },
+  {
+    "id": "recipe_020",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Green Curry",
+    "img": "https://munchingwithmariyah.com/wp-content/uploads/2025/03/IMG_4915.jpg",
+    "totaltime": 40,
+    "writer": "Chef AI",
+    "tags": ["asian", "curry", "coconut"],
+    "cuisine": "Asian",
+    "status": "public",
+    "serving_description": "Serves 3 people",
+    "serving_size": "3",
+    "searchIndex": ["green", "curry", "thai", "coconut"],
+    "ingredients": [
+      {"qty": 2, "unit": "tbsp", "name": "green curry paste"},
+      {"qty": 1, "unit": "can", "name": "coconut milk"},
+      {"qty": 300, "unit": "g", "name": "chicken"}
+    ],
+    "instructionSet": [
+      {"description": "Cook paste in coconut milk."},
+      {"description": "Add meat and vegetables."},
+      {"description": "Simmer until cooked."}
+    ],
+    "nutrition": {
+      "calories": 450,
+      "carbs_g": 15,
+      "fat_g": 30,
+      "fiber_g": 3,
+      "protein_g": 25
+    },
+    "review": 4.6,
+    "averageRating": 4.5,
+    "ratingCount": 12
+  },
+  {
+    "id": "recipe_021",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Sushi Rolls",
+    "img": "https://www.justonecookbook.com/wp-content/uploads/2020/01/Sushi-Rolls-Maki-Sushi-%E2%80%93-Hosomaki-1106-II.jpg",
+    "totaltime": 60,
+    "writer": "Chef AI",
+    "tags": ["japanese", "sushi", "fish"],
+    "cuisine": "Japanese",
+    "status": "public",
+    "serving_description": "Makes 24 pieces",
+    "serving_size": "24",
+    "searchIndex": ["sushi", "rolls", "japanese", "fish"],
+    "ingredients": [
+      {"qty": 2, "unit": "cup", "name": "sushi rice"},
+      {"qty": 4, "unit": "sheet", "name": "nori"},
+      {"qty": 200, "unit": "g", "name": "fresh fish"}
+    ],
+    "instructionSet": [
+      {"description": "Prepare sushi rice."},
+      {"description": "Layer on nori with fillings."},
+      {"description": "Roll and slice."}
+    ],
+    "nutrition": {
+      "calories": 50,
+      "carbs_g": 10,
+      "fat_g": 0.5,
+      "fiber_g": 0.5,
+      "protein_g": 2
+    },
+    "review": 4.8,
+    "averageRating": 4.7,
+    "ratingCount": 30
+  },
+  {
+    "id": "recipe_022",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Ramen",
+    "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0DJ4ydsMCNeIEG76wnZ2nuqXjr0jMUcgcyA&s",
+    "totaltime": 120,
+    "writer": "Chef AI",
+    "tags": ["japanese", "noodles", "soup"],
+    "cuisine": "Japanese",
+    "status": "public",
+    "serving_description": "Serves 2 people",
+    "serving_size": "2",
+    "searchIndex": ["ramen", "noodles", "japanese", "pork"],
+    "ingredients": [
+      {"qty": 2, "unit": "pack", "name": "ramen noodles"},
+      {"qty": 2, "unit": "piece", "name": "soft-boiled eggs"},
+      {"qty": 4, "unit": "slice", "name": "chashu pork"}
+    ],
+    "instructionSet": [
+      {"description": "Prepare broth."},
+      {"description": "Cook noodles."},
+      {"description": "Assemble with toppings."}
+    ],
+    "nutrition": {
+      "calories": 700,
+      "carbs_g": 80,
+      "fat_g": 25,
+      "fiber_g": 4,
+      "protein_g": 35
+    },
+    "review": 4.7,
+    "averageRating": 4.6,
+    "ratingCount": 25
+  },
+  {
+    "id": "recipe_023",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Tempura",
+    "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRG09VdSKMlO8VhwgFLSZQRZhg_fAvYPKwT5Q&s",
+    "totaltime": 30,
+    "writer": "Chef AI",
+    "tags": ["japanese", "fried", "seafood"],
+    "cuisine": "Japanese",
+    "status": "public",
+    "serving_description": "Serves 3 people",
+    "serving_size": "3",
+    "searchIndex": ["tempura", "fried", "japanese", "shrimp"],
+    "ingredients": [
+      {"qty": 12, "unit": "piece", "name": "shrimp"},
+      {"qty": 1, "unit": "cup", "name": "tempura batter mix"},
+      {"qty": 1, "unit": "liter", "name": "oil for frying"}
+    ],
+    "instructionSet": [
+      {"description": "Prepare batter."},
+      {"description": "Coat ingredients."},
+      {"description": "Deep fry until crispy."}
+    ],
+    "nutrition": {
+      "calories": 250,
+      "carbs_g": 20,
+      "fat_g": 15,
+      "fiber_g": 1,
+      "protein_g": 10
+    },
+    "review": 4.6,
+    "averageRating": 4.5,
+    "ratingCount": 18
+  },
+  {
+    "id": "recipe_024",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Teriyaki Chicken",
+    "img": "https://www.budgetbytes.com/wp-content/uploads/2022/04/Teriyaki-Chicken-plate-500x500.jpg",
+    "totaltime": 35,
+    "writer": "Chef AI",
+    "tags": ["japanese", "chicken", "grill"],
+    "cuisine": "Japanese",
+    "status": "public",
+    "serving_description": "Serves 3 people",
+    "serving_size": "3",
+    "searchIndex": ["teriyaki", "chicken", "japanese", "grill"],
+    "ingredients": [
+      {"qty": 500, "unit": "g", "name": "chicken thighs"},
+      {"qty": 0.5, "unit": "cup", "name": "teriyaki sauce"},
+      {"qty": 1, "unit": "tbsp", "name": "sesame seeds"}
+    ],
+    "instructionSet": [
+      {"description": "Marinate chicken."},
+      {"description": "Grill or pan-fry."},
+      {"description": "Glaze with sauce."}
+    ],
+    "nutrition": {
+      "calories": 350,
+      "carbs_g": 15,
+      "fat_g": 15,
+      "fiber_g": 1,
+      "protein_g": 35
+    },
+    "review": 4.5,
+    "averageRating": 4.4,
+    "ratingCount": 15
+  },
+  {
+    "id": "recipe_025",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Miso Soup",
+    "img": "https://int.japanesetaste.com/cdn/shop/articles/mixed-miso-soup-recipe-japanese-taste.jpg?v=1737982159&width=5760",
+    "totaltime": 20,
+    "writer": "Chef AI",
+    "tags": ["japanese", "soup", "miso"],
+    "cuisine": "Japanese",
+    "status": "public",
+    "serving_description": "Serves 4 people",
+    "serving_size": "4",
+    "searchIndex": ["miso", "soup", "japanese", "tofu"],
+    "ingredients": [
+      {"qty": 4, "unit": "cup", "name": "dashi stock"},
+      {"qty": 3, "unit": "tbsp", "name": "miso paste"},
+      {"qty": 100, "unit": "g", "name": "tofu"}
+    ],
+    "instructionSet": [
+      {"description": "Heat stock."},
+      {"description": "Dissolve miso."},
+      {"description": "Add tofu and seaweed."}
+    ],
+    "nutrition": {
+      "calories": 70,
+      "carbs_g": 5,
+      "fat_g": 3,
+      "fiber_g": 1,
+      "protein_g": 5
+    },
+    "review": 4.4,
+    "averageRating": 4.3,
+    "ratingCount": 10
+  },
+  {
+    "id": "recipe_026",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Coq au Vin",
+    "img": "https://static01.nyt.com/images/2023/08/24/multimedia/MC-Coq-Au-Van-ctpm/MC-Coq-Au-Van-ctpm-videoSixteenByNineJumbo1600.jpg",
+    "totaltime": 150,
+    "writer": "Chef AI",
+    "tags": ["french", "chicken", "wine"],
+    "cuisine": "French",
+    "status": "public",
+    "serving_description": "Serves 4 people",
+    "serving_size": "4",
+    "searchIndex": ["coq", "au", "vin", "french"],
+    "ingredients": [
+      {"qty": 1, "unit": "whole", "name": "chicken, cut up"},
+      {"qty": 1, "unit": "bottle", "name": "red wine"},
+      {"qty": 200, "unit": "g", "name": "bacon"}
+    ],
+    "instructionSet": [
+      {"description": "Marinate chicken in wine."},
+      {"description": "Brown with bacon and mushrooms."},
+      {"description": "Simmer in wine sauce."}
+    ],
+    "nutrition": {
+      "calories": 600,
+      "carbs_g": 10,
+      "fat_g": 30,
+      "fiber_g": 2,
+      "protein_g": 45
+    },
+    "review": 4.7,
+    "averageRating": 4.6,
+    "ratingCount": 12
+  },
+  {
+    "id": "recipe_027",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Ratatouille",
+    "img": "https://cdn.apartmenttherapy.info/image/upload/f_jpg,q_auto:eco,c_fill,g_auto,w_1500,ar_1:1/k%2FPhoto%2FRecipes%2F2024-07-ratatouille%2FRatatouille-",
+    "totaltime": 90,
+    "writer": "Chef AI",
+    "tags": ["french", "vegetable", "stew"],
+    "cuisine": "French",
+    "status": "public",
+    "serving_description": "Serves 4 people",
+    "serving_size": "4",
+    "searchIndex": ["ratatouille", "vegetable", "french", "stew"],
+    "ingredients": [
+      {"qty": 2, "unit": "piece", "name": "eggplant"},
+      {"qty": 2, "unit": "piece", "name": "zucchini"},
+      {"qty": 4, "unit": "piece", "name": "tomatoes"}
+    ],
+    "instructionSet": [
+      {"description": "Slice vegetables."},
+      {"description": "Layer in dish."},
+      {"description": "Bake with herbs."}
+    ],
+    "nutrition": {
+      "calories": 200,
+      "carbs_g": 25,
+      "fat_g": 10,
+      "fiber_g": 8,
+      "protein_g": 5
+    },
+    "review": 4.5,
+    "averageRating": 4.4,
+    "ratingCount": 8
+  },
+  {
+    "id": "recipe_028",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Bouillabaisse",
+    "img": "https://www.whats4eats.com/wp-content/uploads/2023/09/soups-bouillabaisse-ccnull.de-Marco-Verch-1099981-4x3-1.webp",
+    "totaltime": 60,
+    "writer": "Chef AI",
+    "tags": ["french", "seafood", "soup"],
+    "cuisine": "French",
+    "status": "public",
+    "serving_description": "Serves 4 people",
+    "serving_size": "4",
+    "searchIndex": ["bouillabaisse", "seafood", "french", "soup"],
+    "ingredients": [
+      {"qty": 500, "unit": "g", "name": "mixed fish"},
+      {"qty": 1, "unit": "cup", "name": "white wine"},
+      {"qty": 2, "unit": "tbsp", "name": "rouille"}
+    ],
+    "instructionSet": [
+      {"description": "Prepare fish stock."},
+      {"description": "Add fish and shellfish."},
+      {"description": "Serve with rouille."}
+    ],
+    "nutrition": {
+      "calories": 350,
+      "carbs_g": 15,
+      "fat_g": 10,
+      "fiber_g": 2,
+      "protein_g": 40
+    },
+    "review": 4.6,
+    "averageRating": 4.5,
+    "ratingCount": 10
+  },
+  {
+    "id": "recipe_029",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Croque Monsieur",
+    "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZJewq848u15KiTeHIdeYSMqNjbvgKbA0zUQ&s",
+    "totaltime": 20,
+    "writer": "Chef AI",
+    "tags": ["french", "sandwich", "ham"],
+    "cuisine": "French",
+    "status": "public",
+    "serving_description": "Serves 2 people",
+    "serving_size": "2",
+    "searchIndex": ["croque", "monsieur", "french", "sandwich"],
+    "ingredients": [
+      {"qty": 4, "unit": "slice", "name": "bread"},
+      {"qty": 4, "unit": "slice", "name": "ham"},
+      {"qty": 1, "unit": "cup", "name": "béchamel sauce"}
+    ],
+    "instructionSet": [
+      {"description": "Layer ham and cheese."},
+      {"description": "Top with béchamel."},
+      {"description": "Grill until golden."}
+    ],
+    "nutrition": {
+      "calories": 500,
+      "carbs_g": 35,
+      "fat_g": 25,
+      "fiber_g": 2,
+      "protein_g": 30
+    },
+    "review": 4.4,
+    "averageRating": 4.3,
+    "ratingCount": 6
+  },
+  {
+    "id": "recipe_030",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Quiche Lorraine",
+    "img": "https://insidermama.com/wp-content/uploads/2025/04/8-quiche.webp",
+    "totaltime": 75,
+    "writer": "Chef AI",
+    "tags": ["french", "quiche", "bacon"],
+    "cuisine": "French",
+    "status": "public",
+    "serving_description": "Serves 6 people",
+    "serving_size": "6",
+    "searchIndex": ["quiche", "lorraine", "french", "pie"],
+    "ingredients": [
+      {"qty": 1, "unit": "piece", "name": "pie crust"},
+      {"qty": 200, "unit": "g", "name": "bacon"},
+      {"qty": 4, "unit": "piece", "name": "eggs"}
+    ],
+    "instructionSet": [
+      {"description": "Pre-bake crust."},
+      {"description": "Add bacon and cheese."},
+      {"description": "Pour egg mixture and bake."}
+    ],
+    "nutrition": {
+      "calories": 400,
+      "carbs_g": 20,
+      "fat_g": 30,
+      "fiber_g": 1,
+      "protein_g": 15
+    },
+    "review": 4.7,
+    "averageRating": 4.6,
+    "ratingCount": 15
+  },
+  {
+    "id": "recipe_031",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Cheeseburger",
+    "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmabr4dqBCRVA4Jg3xjHROdF9hLrXOQT9utA&s",
+    "totaltime": 25,
+    "writer": "Chef AI",
+    "tags": ["american", "burger", "beef"],
+    "cuisine": "American",
+    "status": "public",
+    "serving_description": "Serves 2 people",
+    "serving_size": "2",
+    "searchIndex": ["cheeseburger", "american", "beef", "burger"],
+    "ingredients": [
+      {"qty": 2, "unit": "piece", "name": "burger buns"},
+      {"qty": 300, "unit": "g", "name": "ground beef"},
+      {"qty": 2, "unit": "slice", "name": "cheddar cheese"}
+    ],
+    "instructionSet": [
+      {"description": "Form and cook patties."},
+      {"description": "Melt cheese on top."},
+      {"description": "Assemble with toppings."}
+    ],
+    "nutrition": {
+      "calories": 700,
+      "carbs_g": 40,
+      "fat_g": 40,
+      "fiber_g": 2,
+      "protein_g": 40
+    },
+    "review": 4.5,
+    "averageRating": 4.4,
+    "ratingCount": 20
+  },
+  {
+    "id": "recipe_032",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Mac & Cheese",
+    "img": "https://www.allrecipes.com/thmb/CanMXBeN-9DZyRSzDxLAoy0w-t8=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/238691-Simple-Macaroni-And-Cheese-mfs_006-f7f521c65f894aef85e17bc9125c2c4a.jpg",
+    "totaltime": 35,
+    "writer": "Chef AI",
+    "tags": ["american", "pasta", "cheese"],
+    "cuisine": "American",
+    "status": "public",
+    "serving_description": "Serves 4 people",
+    "serving_size": "4",
+    "searchIndex": ["mac", "cheese", "american", "pasta"],
+    "ingredients": [
+      {"qty": 300, "unit": "g", "name": "elbow macaroni"},
+      {"qty": 2, "unit": "cup", "name": "cheddar cheese"},
+      {"qty": 2, "unit": "cup", "name": "milk"}
+    ],
+    "instructionSet": [
+      {"description": "Cook pasta."},
+      {"description": "Make cheese sauce."},
+      {"description": "Combine and bake."}
+    ],
+    "nutrition": {
+      "calories": 550,
+      "carbs_g": 60,
+      "fat_g": 25,
+      "fiber_g": 2,
+      "protein_g": 20
+    },
+    "review": 4.6,
+    "averageRating": 4.5,
+    "ratingCount": 18
+  },
+  {
+    "id": "recipe_033",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Fried Chicken",
+    "img": "https://www.tasteofhome.com/wp-content/uploads/2024/09/Buttermilk-Fried-Chicken_EXPS_FT24_4371_JR_0904_3_RMS.jpg?w=892",
+    "totaltime": 60,
+    "writer": "Chef AI",
+    "tags": ["american", "chicken", "fried"],
+    "cuisine": "American",
+    "status": "public",
+    "serving_description": "Serves 4 people",
+    "serving_size": "4",
+    "searchIndex": ["fried", "chicken", "american", "crispy"],
+    "ingredients": [
+      {"qty": 8, "unit": "piece", "name": "chicken pieces"},
+      {"qty": 2, "unit": "cup", "name": "buttermilk"},
+      {"qty": 2, "unit": "cup", "name": "flour"}
+    ],
+    "instructionSet": [
+      {"description": "Marinate chicken."},
+      {"description": "Coat with seasoned flour."},
+      {"description": "Deep fry until golden."}
+    ],
+    "nutrition": {
+      "calories": 500,
+      "carbs_g": 30,
+      "fat_g": 25,
+      "fiber_g": 1,
+      "protein_g": 35
+    },
+    "review": 4.7,
+    "averageRating": 4.6,
+    "ratingCount": 25
+  },
+  {
+    "id": "recipe_034",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Pancakes",
+    "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRaQhGq1TytZSvpV2DW5N9zx1itoue_ekC1g&s",
+    "totaltime": 20,
+    "writer": "Chef AI",
+    "tags": ["american", "breakfast", "sweet"],
+    "cuisine": "American",
+    "status": "public",
+    "serving_description": "Serves 3 people",
+    "serving_size": "3",
+    "searchIndex": ["pancakes", "breakfast", "american", "syrup"],
+    "ingredients": [
+      {"qty": 1, "unit": "cup", "name": "flour"},
+      {"qty": 1, "unit": "cup", "name": "milk"},
+      {"qty": 1, "unit": "piece", "name": "egg"}
+    ],
+    "instructionSet": [
+      {"description": "Mix batter."},
+      {"description": "Cook on griddle."},
+      {"description": "Serve with syrup."}
+    ],
+    "nutrition": {
+      "calories": 300,
+      "carbs_g": 50,
+      "fat_g": 8,
+      "fiber_g": 1,
+      "protein_g": 8
+    },
+    "review": 4.8,
+    "averageRating": 4.7,
+    "ratingCount": 30
+  },
+  {
+    "id": "recipe_035",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "BBQ Ribs",
+    "img": "https://www.spendwithpennies.com/wp-content/uploads/2022/06/Oven-Baked-Ribs-SpendWithPennies-4.jpg",
+    "totaltime": 240,
+    "writer": "Chef AI",
+    "tags": ["american", "ribs", "bbq"],
+    "cuisine": "American",
+    "status": "public",
+    "serving_description": "Serves 4 people",
+    "serving_size": "4",
+    "searchIndex": ["bbq", "ribs", "american", "grill"],
+    "ingredients": [
+      {"qty": 1, "unit": "rack", "name": "pork ribs"},
+      {"qty": 1, "unit": "cup", "name": "BBQ sauce"},
+      {"qty": 2, "unit": "tbsp", "name": "dry rub"}
+    ],
+    "instructionSet": [
+      {"description": "Season ribs."},
+      {"description": "Slow cook until tender."},
+      {"description": "Glaze and grill."}
+    ],
+    "nutrition": {
+      "calories": 800,
+      "carbs_g": 30,
+      "fat_g": 50,
+      "fiber_g": 1,
+      "protein_g": 60
+    },
+    "review": 4.9,
+    "averageRating": 4.8,
+    "ratingCount": 20
+  },
+  {
+    "id": "recipe_036",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Greek Salad",
+    "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVszQzT5Yler0fycOCa3f6d06GXPyjKxl7rg&s",
+    "totaltime": 15,
+    "writer": "Chef AI",
+    "tags": ["mediterranean", "salad", "vegetarian"],
+    "cuisine": "Mediterranean",
+    "status": "public",
+    "serving_description": "Serves 2 people",
+    "serving_size": "2",
+    "searchIndex": ["greek", "salad", "mediterranean", "feta"],
+    "ingredients": [
+      {"qty": 1, "unit": "piece", "name": "cucumber"},
+      {"qty": 2, "unit": "piece", "name": "tomatoes"},
+      {"qty": 100, "unit": "g", "name": "feta cheese"}
+    ],
+    "instructionSet": [
+      {"description": "Chop vegetables."},
+      {"description": "Add olives and feta."},
+      {"description": "Dress with olive oil."}
+    ],
+    "nutrition": {
+      "calories": 250,
+      "carbs_g": 10,
+      "fat_g": 20,
+      "fiber_g": 3,
+      "protein_g": 8
+    },
+    "review": 4.5,
+    "averageRating": 4.4,
+    "ratingCount": 12
+  },
+  {
+    "id": "recipe_037",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Hummus",
+    "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJLx5QEHi8rpUNdwjxQ6OjpQ0GwXIApnVkRQ&s",
+    "totaltime": 10,
+    "writer": "Chef AI",
+    "tags": ["mediterranean", "dip", "vegetarian"],
+    "cuisine": "Mediterranean",
+    "status": "public",
+    "serving_description": "Serves 4 people",
+    "serving_size": "4",
+    "searchIndex": ["hummus", "chickpea", "mediterranean", "dip"],
+    "ingredients": [
+      {"qty": 1, "unit": "can", "name": "chickpeas"},
+      {"qty": 2, "unit": "tbsp", "name": "tahini"},
+      {"qty": 2, "unit": "tbsp", "name": "lemon juice"}
+    ],
+    "instructionSet": [
+      {"description": "Blend all ingredients."},
+      {"description": "Adjust seasoning."},
+      {"description": "Drizzle with olive oil."}
+    ],
+    "nutrition": {
+      "calories": 150,
+      "carbs_g": 15,
+      "fat_g": 8,
+      "fiber_g": 5,
+      "protein_g": 5
+    },
+    "review": 4.7,
+    "averageRating": 4.6,
+    "ratingCount": 15
+  },
+  {
+    "id": "recipe_038",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Falafel",
+    "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQf2xzoSfpFTAZgC2xdbrca3o2Ux92Tnvav0w&s",
+    "totaltime": 45,
+    "writer": "Chef AI",
+    "tags": ["mediterranean", "vegetarian", "fried"],
+    "cuisine": "Mediterranean",
+    "status": "public",
+    "serving_description": "Makes 20 pieces",
+    "serving_size": "20",
+    "searchIndex": ["falafel", "chickpea", "mediterranean", "fried"],
+    "ingredients": [
+      {"qty": 2, "unit": "cup", "name": "chickpeas, soaked"},
+      {"qty": 1, "unit": "cup", "name": "fresh herbs"},
+      {"qty": 1, "unit": "liter", "name": "oil for frying"}
+    ],
+    "instructionSet": [
+      {"description": "Process chickpeas with herbs."},
+      {"description": "Form into balls."},
+      {"description": "Deep fry until golden."}
+    ],
+    "nutrition": {
+      "calories": 60,
+      "carbs_g": 8,
+      "fat_g": 2,
+      "fiber_g": 2,
+      "protein_g": 3
+    },
+    "review": 4.6,
+    "averageRating": 4.5,
+    "ratingCount": 18
+  },
+  {
+    "id": "recipe_039",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Shakshuka",
+    "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQurVFIOGjF8YgvjhCv1K2DleicbAr_pkwSAg&s",
+    "totaltime": 35,
+    "writer": "Chef AI",
+    "tags": ["mediterranean", "eggs", "tomato"],
+    "cuisine": "Mediterranean",
+    "status": "public",
+    "serving_description": "Serves 3 people",
+    "serving_size": "3",
+    "searchIndex": ["shakshuka", "eggs", "mediterranean", "tomato"],
+    "ingredients": [
+      {"qty": 4, "unit": "piece", "name": "eggs"},
+      {"qty": 4, "unit": "piece", "name": "tomatoes"},
+      {"qty": 1, "unit": "piece", "name": "onion"}
+    ],
+    "instructionSet": [
+      {"description": "Cook tomato sauce with spices."},
+      {"description": "Make wells and crack eggs."},
+      {"description": "Cover until eggs are set."}
+    ],
+    "nutrition": {
+      "calories": 250,
+      "carbs_g": 15,
+      "fat_g": 15,
+      "fiber_g": 3,
+      "protein_g": 12
+    },
+    "review": 4.7,
+    "averageRating": 4.6,
+    "ratingCount": 12
+  },
+  {
+    "id": "recipe_040",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Moussaka",
+    "img": "https://www.recipetineats.com/tachyon/2019/03/Greek-Moussaka_3-re-edited-SQ.jpg",
+    "totaltime": 120,
+    "writer": "Chef AI",
+    "tags": ["mediterranean", "eggplant", "lamb"],
+    "cuisine": "Mediterranean",
+    "status": "public",
+    "serving_description": "Serves 6 people",
+    "serving_size": "6",
+    "searchIndex": ["moussaka", "eggplant", "mediterranean", "lamb"],
+    "ingredients": [
+      {"qty": 2, "unit": "piece", "name": "eggplant"},
+      {"qty": 500, "unit": "g", "name": "ground lamb"},
+      {"qty": 1, "unit": "cup", "name": "béchamel sauce"}
+    ],
+    "instructionSet": [
+      {"description": "Slice and salt eggplant."},
+      {"description": "Cook lamb with tomatoes."},
+      {"description": "Layer and bake with béchamel."}
+    ],
+    "nutrition": {
+      "calories": 450,
+      "carbs_g": 20,
+      "fat_g": 30,
+      "fiber_g": 6,
+      "protein_g": 25
+    },
+    "review": 4.8,
+    "averageRating": 4.7,
+    "ratingCount": 15
+  },
+  {
+    "id": "recipe_041",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Poutine",
+    "img": "https://www.seriouseats.com/thmb/vICHAu16XWhAc-WLQV-7avihHKY=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/ultimate-perfect-poutine-fries-cheese-curds-gravy-recipe-hero-2-7637732f8c174bc59f9b84e7b6e6b660.jpg",
+    "totaltime": 30,
+    "writer": "Chef AI",
+    "tags": ["other", "fries", "cheese"],
+    "cuisine": "Other",
+    "status": "public",
+    "serving_description": "Serves 2 people",
+    "serving_size": "2",
+    "searchIndex": ["poutine", "fries", "gravy", "cheese"],
+    "ingredients": [
+      {"qty": 500, "unit": "g", "name": "french fries"},
+      {"qty": 1, "unit": "cup", "name": "cheese curds"},
+      {"qty": 1, "unit": "cup", "name": "gravy"}
+    ],
+    "instructionSet": [
+      {"description": "Cook fries until crispy."},
+      {"description": "Top with cheese curds."},
+      {"description": "Pour hot gravy over."}
+    ],
+    "nutrition": {
+      "calories": 800,
+      "carbs_g": 70,
+      "fat_g": 45,
+      "fiber_g": 5,
+      "protein_g": 20
+    },
+    "review": 4.6,
+    "averageRating": 4.5,
+    "ratingCount": 10
+  },
+  {
+    "id": "recipe_042",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Beef Wellington",
+    "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHyx4w7fcfK5dgA-RkRp6w7-w9G0k0_fd_3Q&s",
+    "totaltime": 180,
+    "writer": "Chef AI",
+    "tags": ["other", "beef", "pastry"],
+    "cuisine": "Other",
+    "status": "public",
+    "serving_description": "Serves 4 people",
+    "serving_size": "4",
+    "searchIndex": ["beef", "wellington", "pastry", "gourmet"],
+    "ingredients": [
+      {"qty": 1, "unit": "piece", "name": "beef tenderloin"},
+      {"qty": 200, "unit": "g", "name": "mushrooms"},
+      {"qty": 1, "unit": "sheet", "name": "puff pastry"}
+    ],
+    "instructionSet": [
+      {"description": "Sear beef."},
+      {"description": "Wrap in mushroom duxelles and pastry."},
+      {"description": "Bake until golden."}
+    ],
+    "nutrition": {
+      "calories": 700,
+      "carbs_g": 30,
+      "fat_g": 40,
+      "fiber_g": 2,
+      "protein_g": 50
+    },
+    "review": 4.9,
+    "averageRating": 4.8,
+    "ratingCount": 8
+  },
+  {
+    "id": "recipe_043",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Fish and Chips",
+    "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTukxzqGHA9a7bViGgrPUh_lvTwmGN3Kz6BZA&s",
+    "totaltime": 45,
+    "writer": "Chef AI",
+    "tags": ["other", "fish", "fried"],
+    "cuisine": "Other",
+    "status": "public",
+    "serving_description": "Serves 2 people",
+    "serving_size": "2",
+    "searchIndex": ["fish", "chips", "fried", "british"],
+    "ingredients": [
+      {"qty": 2, "unit": "piece", "name": "white fish fillets"},
+      {"qty": 1, "unit": "cup", "name": "beer batter"},
+      {"qty": 500, "unit": "g", "name": "potatoes"}
+    ],
+    "instructionSet": [
+      {"description": "Cut potatoes into fries."},
+      {"description": "Batter and fry fish."},
+      {"description": "Fry chips until crispy."}
+    ],
+    "nutrition": {
+      "calories": 900,
+      "carbs_g": 80,
+      "fat_g": 50,
+      "fiber_g": 6,
+      "protein_g": 35
+    },
+    "review": 4.7,
+    "averageRating": 4.6,
+    "ratingCount": 12
+  },
+  {
+    "id": "recipe_044",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Chicken Tikka Masala",
+    "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTrh0ltKlY2JWV1J2lC5R2-6Ray_R04K43_Fw&s",
+    "totaltime": 60,
+    "writer": "Chef AI",
+    "tags": ["other", "chicken", "curry"],
+    "cuisine": "Other",
+    "status": "public",
+    "serving_description": "Serves 4 people",
+    "serving_size": "4",
+    "searchIndex": ["chicken", "tikka", "masala", "curry"],
+    "ingredients": [
+      {"qty": 500, "unit": "g", "name": "chicken breast"},
+      {"qty": 1, "unit": "cup", "name": "yogurt marinade"},
+      {"qty": 1, "unit": "can", "name": "tomato sauce"}
+    ],
+    "instructionSet": [
+      {"description": "Marinate and grill chicken."},
+      {"description": "Simmer in spiced tomato sauce."},
+      {"description": "Finish with cream."}
+    ],
+    "nutrition": {
+      "calories": 500,
+      "carbs_g": 20,
+      "fat_g": 25,
+      "fiber_g": 3,
+      "protein_g": 45
+    },
+    "review": 4.8,
+    "averageRating": 4.7,
+    "ratingCount": 15
+  },
+  {
+    "id": "recipe_045",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Paella",
+    "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJt1kDcWSfaSLs64slfhOElIt8DtP3uqYAtQ&s",
+    "totaltime": 90,
+    "writer": "Chef AI",
+    "tags": ["other", "rice", "seafood"],
+    "cuisine": "Other",
+    "status": "public",
+    "serving_description": "Serves 6 people",
+    "serving_size": "6",
+    "searchIndex": ["paella", "rice", "seafood", "spanish"],
+    "ingredients": [
+      {"qty": 2, "unit": "cup", "name": "bomba rice"},
+      {"qty": 500, "unit": "g", "name": "mixed seafood"},
+      {"qty": 1, "unit": "pinch", "name": "saffron"}
+    ],
+    "instructionSet": [
+      {"description": "Prepare sofrito."},
+      {"description": "Add rice and broth."},
+      {"description": "Arrange seafood and cook."}
+    ],
+    "nutrition": {
+      "calories": 550,
+      "carbs_g": 70,
+      "fat_g": 15,
+      "fiber_g": 3,
+      "protein_g": 35
+    },
+    "review": 4.7,
+    "averageRating": 4.6,
+    "ratingCount": 10
+  }
+]

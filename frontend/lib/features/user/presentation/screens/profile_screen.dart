@@ -10,11 +10,12 @@ import 'package:image_picker/image_picker.dart';
 import '../../data/firebase_user_service.dart';
 import '../../domain/user_entity.dart';
 import '../../data/user_data.dart';
+import '/shared/widgets/banner_ad.dart';
 
 import '/features/user/presentation/widgets/profile_header.dart';
 import '/features/user/presentation/widgets/profile_actions.dart';
-import '/features/user/presentation/widgets/posts_list.dart';
-import '/features/user/presentation/widgets/activity_history.dart';
+//import '/features/user/presentation/widgets/posts_list.dart';
+//import '/features/user/presentation/widgets/activity_history.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -313,10 +314,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             onChangePassword: _changePassword,
             onDeleteAccount: _deleteAccount,
           ),
-          const SizedBox(height: 24),
-          PostsList(posts: posts),
-          const SizedBox(height: 24),
-          ActivityHistory(activities: activities),
+          // const SizedBox(height: 24),
+          // PostsList(posts: posts),
+          // const SizedBox(height: 24),
+          // ActivityHistory(activities: activities),
         ],
       );
     }
@@ -369,57 +370,64 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.only(bottom: 10),
-            child: userId == null
-                ? const Center(child: Text('Not logged in'))
-                : useMock
-                ? FutureBuilder<UserEntity>(
-              future: mockUserData.getUser(),
-              builder: (context, userSnap) {
-                if (!userSnap.hasData) return const Center(child: CircularProgressIndicator());
-                final user = userSnap.data!;
-                return FutureBuilder<List<Post>>(
-                  future: mockUserData.getUserPosts(),
-                  builder: (context, postSnap) {
-                    if (!postSnap.hasData) return const Center(child: CircularProgressIndicator());
-                    final posts = postSnap.data!;
-                    return FutureBuilder<List<Activity>>(
-                      future: mockUserData.getActivityHistory(),
-                      builder: (context, actSnap) {
-                        if (!actSnap.hasData) return const Center(child: CircularProgressIndicator());
-                        final activities = actSnap.data!;
-                        return profileContent(user, posts, activities);
-                      },
-                    );
-                  },
-                );
-              },
-            )
-                : StreamBuilder<UserEntity?>(
-              stream: userService.userStream(userId!),
-              builder: (context, userSnap) {
-                if (userSnap.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (!userSnap.hasData || userSnap.data == null) {
-                  return const Center(child: Text('User profile not found.'));
-                }
-                final user = userSnap.data!;
-                return StreamBuilder<List<Post>>(
-                  stream: userService.userPostsStream(userId!),
-                  builder: (context, postSnap) {
-                    if (!postSnap.hasData) return const Center(child: CircularProgressIndicator());
-                    final posts = postSnap.data!;
-                    return StreamBuilder<List<Activity>>(
-                      stream: userService.activityHistoryStream(userId!),
-                      builder: (context, actSnap) {
-                        if (!actSnap.hasData) return const Center(child: CircularProgressIndicator());
-                        final activities = actSnap.data!;
-                        return profileContent(user, posts, activities);
-                      },
-                    );
-                  },
-                );
-              },
+            child: Column(
+              children: [
+                userId == null
+                    ? const Center(child: Text('Not logged in'))
+                    : useMock
+                        ? FutureBuilder<UserEntity>(
+                            future: mockUserData.getUser(),
+                            builder: (context, userSnap) {
+                              if (!userSnap.hasData) return const Center(child: CircularProgressIndicator());
+                              final user = userSnap.data!;
+                              return FutureBuilder<List<Post>>(
+                                future: mockUserData.getUserPosts(),
+                                builder: (context, postSnap) {
+                                  if (!postSnap.hasData) return const Center(child: CircularProgressIndicator());
+                                  final posts = postSnap.data!;
+                                  return FutureBuilder<List<Activity>>(
+                                    future: mockUserData.getActivityHistory(),
+                                    builder: (context, actSnap) {
+                                      if (!actSnap.hasData) return const Center(child: CircularProgressIndicator());
+                                      final activities = actSnap.data!;
+                                      return profileContent(user, posts, activities);
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                          )
+                        : StreamBuilder<UserEntity?>(
+                            stream: userService.userStream(userId!),
+                            builder: (context, userSnap) {
+                              if (userSnap.connectionState == ConnectionState.waiting) {
+                                return const Center(child: CircularProgressIndicator());
+                              }
+                              if (!userSnap.hasData || userSnap.data == null) {
+                                return const Center(child: Text('User profile not found.'));
+                              }
+                              final user = userSnap.data!;
+                              return StreamBuilder<List<Post>>(
+                                stream: userService.userPostsStream(userId!),
+                                builder: (context, postSnap) {
+                                  if (!postSnap.hasData) return const Center(child: CircularProgressIndicator());
+                                  final posts = postSnap.data!;
+                                  return StreamBuilder<List<Activity>>(
+                                    stream: userService.activityHistoryStream(userId!),
+                                    builder: (context, actSnap) {
+                                      if (!actSnap.hasData) return const Center(child: CircularProgressIndicator());
+                                      final activities = actSnap.data!;
+                                      return profileContent(user, posts, activities);
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                // Add the banner ad widget at the end
+                const SizedBox(height: 24),
+                MyBannerAdWidget(),
+              ],
             ),
           ),
         ),

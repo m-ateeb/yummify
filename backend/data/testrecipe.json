@@ -1,0 +1,81 @@
+[
+      {
+    "id": "kP3mNqXwZ9vR2sT4yL67",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Spaghetti Bolognese",
+    "img": "https://img.taste.com.au/VFkGwzXU/w720-h480-cfill-q80/taste/2016/11/spaghetti-bolognese-106560-1.jpeg",
+    "totaltime": 45,
+    "writer": "Chef AI",
+    "tags": ["italian", "pasta", "beef"],
+    "cuisine": "Italian",
+    "status": "published",
+    "serving_description": "Serves 4 people",
+    "serving_size": "4",
+    "searchIndex": ["spaghetti", "bolognese", "pasta", "italian", "beef"],
+    "ingredients": [
+      {"qty": 500, "unit": "g", "name": "spaghetti"},
+      {"qty": 250, "unit": "g", "name": "ground beef"},
+      {"qty": 1, "unit": "cup", "name": "tomato sauce", "note": "preferably homemade"}
+    ],
+    "descriptionBlocks": [
+      {
+        "heading1": "A Classic Italian Favorite",
+        "body": "This spaghetti bolognese recipe brings comfort and flavor to your dinner table.",
+        "image": "https://img.taste.com.au/VFkGwzXU/w720-h480-cfill-q80/taste/2016/11/spaghetti-bolognese-106560-1.jpeg"
+      }
+    ],
+    "instructionSet": [
+      {"description": "Boil water and cook spaghetti until al dente."},
+      {"description": "Brown the beef in a pan, then add tomato sauce and simmer."},
+      {"description": "Combine spaghetti with the sauce and serve hot."}
+    ],
+    "nutrition": {
+      "calories": 600,
+      "carbs_g": 70,
+      "fat_g": 20,
+      "fiber_g": 5,
+      "protein_g": 25
+    },
+    "review": 4.5,
+    "averageRating": 4.4,
+    "ratingCount": 12
+  },
+  {
+    "id": "rsE0UflDQ7lQG9EBOL81",
+    "createdBy": "yummify",
+    "role": "yummify",
+    "visibility": "public",
+    "name": "Margherita Pizza",
+    "img": "https://safrescobaldistatic.blob.core.windows.net/media/2022/11/PIZZA-MARGHERITA.jpg",
+    "totaltime": 30,
+    "writer": "Chef AI",
+    "tags": ["italian", "pizza", "vegetarian"],
+    "cuisine": "Italian",
+    "status": "published",
+    "serving_description": "Serves 2 people",
+    "serving_size": "2",
+    "searchIndex": ["pizza", "margherita", "italian", "cheese", "tomato"],
+    "ingredients": [
+      {"qty": 1, "unit": "piece", "name": "pizza dough"},
+      {"qty": 100, "unit": "g", "name": "mozzarella cheese"},
+      {"qty": 0.5, "unit": "cup", "name": "tomato sauce"}
+    ],
+    "instructionSet": [
+      {"description": "Roll out the pizza dough."},
+      {"description": "Spread tomato sauce and add cheese."},
+      {"description": "Bake at 220°C for 12-15 minutes."}
+    ],
+    "nutrition": {
+      "calories": 800,
+      "carbs_g": 90,
+      "fat_g": 35,
+      "fiber_g": 4,
+      "protein_g": 30
+    },
+    "review": 4.7,
+    "averageRating": 4.6,
+    "ratingCount": 15
+  }
+]

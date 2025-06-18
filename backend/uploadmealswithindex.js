@@ -10,7 +10,7 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
-const mealsFilePath = path.join(__dirname, 'data', 'food_dataset_final.json');
+const mealsFilePath = path.join(__dirname, 'data', 'recipes.json');
 const mealsData = JSON.parse(fs.readFileSync(mealsFilePath, 'utf8'));
 
 function generateSearchIndex(name) {
@@ -23,7 +23,7 @@ function generateSearchIndex(name) {
 }
 
 async function uploadMeals() {
-  const collectionRef = db.collection('meals');
+  const collectionRef = db.collection('recipes');
 
   // 1. Get all existing IDs and names from Firestore once
   const existingDocs = await collectionRef.get();

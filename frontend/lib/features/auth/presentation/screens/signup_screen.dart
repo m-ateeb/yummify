@@ -46,10 +46,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       );
 
       if (user != null && mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
-        );
+        // Navigate to main/root screen with bottom bar
+        Navigator.of(context).pushNamedAndRemoveUntil('/main', (route) => false);
       }
     } catch (e) {
       _showErrorSnackBar('Sign-up failed: ${_parseError(e)}');
@@ -62,21 +60,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() => _isLoading = true);
 
     try {
+      // Always disconnect and create a new instance to force account selection and clear session
+      final googleSignIn = GoogleSignIn();
+      await googleSignIn.disconnect();
       final user = await _authService.signInWithGoogle();
 
-      if (user != null) {
-        final isNewUser = user.metadata.creationTime == user.metadata.lastSignInTime;
-
-        if (isNewUser) {
-          await FirebaseAuthService().createUserInFirestore(user);
-        }
-
+      if (user == null) {
+        // User canceled sign-in
         if (mounted) {
-          Navigator.pushReplacementNamed(context, '/');
+          setState(() => _isLoading = false);
+          _showErrorSnackBar('Google sign-up canceled.');
         }
+        return;
+      }
+
+      final isNewUser = user.metadata.creationTime == user.metadata.lastSignInTime;
+
+      if (isNewUser) {
+        await FirebaseAuthService().createUserInFirestore(user);
+      }
+
+      if (mounted) {
+        Navigator.of(context).pushNamedAndRemoveUntil('/main', (route) => false);
       }
     } catch (e) {
-      _showErrorSnackBar('Google sign-up failed: ${_parseError(e)}');
+      if (mounted) {
+        _showErrorSnackBar('Google sign-up failed: ${_parseError(e)}');
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

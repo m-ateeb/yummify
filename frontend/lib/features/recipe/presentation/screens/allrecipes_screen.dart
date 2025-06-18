@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/recipe_entity.dart';
 import '../../data/recipe_repository_provider.dart'; // Make sure this points to recipe_providers.dart
-
+import '/shared/widgets/banner_ad.dart';
 import 'recipe_builder_page.dart'; // Import the AI Recipe Builder Page
 import 'createrecipe_screen.dart';
 import 'recipedetail_screen.dart';
@@ -157,7 +157,6 @@ class _AllRecipesScreenState extends ConsumerState<AllRecipesScreen> with Ticker
 
           // New recipes: latest 10 by creation date
           final newRecipes = recipes.sorted((a, b) => b.createdAt.compareTo(a.createdAt)).take(10).toList();
-
           return FadeTransition(
             opacity: _cardEnterAnimation,
             child: ListView(
